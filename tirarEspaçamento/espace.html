@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remover Espaços e Adicionar Espaço com *</title>
+</head>
+<body>
+    <h1>Remover Espaços e Adicionar Espaço ao Encontrar *</h1>
+
+    <!-- Área de texto maior para entrada -->
+    <textarea id="texto" rows="10" cols="50" placeholder="Digite ou cole seu texto aqui..."></textarea>
+    <br><br>
+    <button onclick="removerEspacos()">Remover Espaços</button>
+    <br><br>
+    <h3>Resultado:</h3>
+    <textarea id="resultado" rows="10" cols="50" readonly placeholder="O resultado será exibido aqui..."></textarea>
+
+    <script>
+        // Função para remover espaços, manter linhas e adicionar espaço após asteriscos
+        function removerEspacos() {
+            const textoEntrada = document.getElementById("texto").value;
+
+            // Remove espaços, mantendo as quebras de linha
+            let textoProcessado = textoEntrada.replace(/[ \t]+/g, '');
+
+            // Adiciona um espaço ao redor de cada '*'
+            textoProcessado = textoProcessado.replace(/\*/g, ' * ');
+
+            // Remove espaços extras ao redor do texto processado, se houver
+            textoProcessado = textoProcessado.replace(/ +/g, ' ');
+
+            // Exibe o texto no campo de resultado
+            document.getElementById("resultado").value = textoProcessado.trim();
+        }
+    </script>
+</body>
+</html>

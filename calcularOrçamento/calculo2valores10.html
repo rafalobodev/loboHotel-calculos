@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de 2 Valores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            color: rgb(242, 255, 0); /* Aqui você pode usar o nome da cor, um código hexadecimal (#ff0000), ou RGB */
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 5px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        input {
+            width: 60px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .resultado {
+            background-color: #fdf4c7;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        #resultado-final-compacto-1, #resultado-final-compacto-2 {
+            margin-top: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            font-size: 14px;
+            border: 1px solid black;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h2>Calculadora de 2 Valores 10%</h2>
+
+    <button type="button" onclick="inverterTaxas()">Remover Taxas</button>
+    <label for="taxa">Taxas (%):</label>
+    <input type="number" id="taxa" value="10" min="0" max="100" step="1">
+    <button type="button" onclick="aplicarTaxas()">Aplicar Taxas</button>
+    <button type="button" onclick="calcular()">Calcular Totais</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Categoria</th>
+                <th>Qtd 1</th>
+                <th>Valor 1</th>
+                <th>Qtd 2</th>
+                <th>Valor 2</th>
+                <th>Total</th>
+                <th>Desconto (%)</th>
+                <th>Com Desconto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Simples</td>
+                <td><input type="number" id="compacto-simples-qtd1" value="1" min="0"></td>
+                <td><input type="number" id="compacto-simples-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="compacto-simples-qtd2" value="1" min="0"></td>
+                <td><input type="number" id="compacto-simples-valor2" value="100" min="0" step="0.01"></td>
+                <td class="resultado" id="compacto-simples-total">R$ 0,00</td>
+                <td><input type="number" id="compacto-simples-desc-perc" value="10" min="0" max="100" step="5"></td>
+                <td class="resultado" id="compacto-simples-desc">R$ 0,00</td>
+            </tr>
+            <tr>
+                <td>Médio</td>
+                <td><input type="number" id="compacto-medio-qtd1" value="1" min="0"></td>
+                <td><input type="number" id="compacto-medio-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="compacto-medio-qtd2" value="1" min="0"></td>
+                <td><input type="number" id="compacto-medio-valor2" value="100" min="0" step="0.01"></td>
+                <td class="resultado" id="compacto-medio-total">R$ 0,00</td>
+                <td><input type="number" id="compacto-medio-desc-perc" value="10" min="0" max="100" step="5"></td>
+                <td class="resultado" id="compacto-medio-desc">R$ 0,00</td>
+            </tr>
+            <tr>
+                <td>Master</td>
+                <td><input type="number" id="compacto-master-qtd1" value="1" min="0"></td>
+                <td><input type="number" id="compacto-master-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="compacto-master-qtd2" value="1" min="0"></td>
+                <td><input type="number" id="compacto-master-valor2" value="100" min="0" step="0.01"></td>
+                <td class="resultado" id="compacto-master-total">R$ 0,00</td>
+                <td><input type="number" id="compacto-master-desc-perc" value="10" min="0" max="100" step="5"></td>
+                <td class="resultado" id="compacto-master-desc">R$ 0,00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="resultado-final-compacto-1"></div>
+    <div id="resultado-final-compacto-2"></div>
+
+    <script>
+        function aplicarTaxas() {
+        const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+
+        ["compacto-simples", "compacto-medio", "compacto-master"].forEach(categoria => {
+            for (let i = 1; i <= 2; i++) {
+                const valorInput = document.getElementById(`${categoria}-valor${i}`);
+                const valorAtual = parseFloat(valorInput.value) || 0;
+                const valorComTaxa = valorAtual * (1 + (taxaPercentual / 100));
+                valorInput.value = valorComTaxa.toFixed(2); // Atualiza o campo com o valor com a taxa aplicada
+            }
+        });
+    }
+
+    function inverterTaxas() {
+        const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+        const divisor = 1 + (taxaPercentual / 100);
+
+        ["compacto-simples", "compacto-medio", "compacto-master"].forEach(categoria => {
+            for (let i = 1; i <= 2; i++) {
+                const valorInput = document.getElementById(`${categoria}-valor${i}`);
+                const valorAtual = parseFloat(valorInput.value) || 0;
+                const valorSemTaxa = valorAtual / divisor; // Remove a taxa
+                valorInput.value = valorSemTaxa.toFixed(2); // Atualiza o campo com o valor original
+            }
+        });
+    }
+        function calcular() {
+            const categorias = ["compacto-simples", "compacto-medio", "compacto-master"];
+            let resultadosSemDesconto = "";
+            let resultadosComDesconto = "";
+
+            categorias.forEach(categoria => {
+                const qtd1 = parseFloat(document.getElementById(`${categoria}-qtd1`).value) || 0;
+                const valor1 = parseFloat(document.getElementById(`${categoria}-valor1`).value) || 0;
+                const qtd2 = parseFloat(document.getElementById(`${categoria}-qtd2`).value) || 0;
+                const valor2 = parseFloat(document.getElementById(`${categoria}-valor2`).value) || 0;
+                const descontoPercentual = parseFloat(document.getElementById(`${categoria}-desc-perc`).value) || 0;
+
+                const total = (qtd1 * valor1) + (qtd2 * valor2);
+                const desconto = total * (descontoPercentual / 100);
+                const totalComDesconto = total - desconto;
+
+                // Atualizando valores na tabela
+                document.getElementById(`${categoria}-total`).innerText = `R$ ${total.toFixed(2)}`;
+                document.getElementById(`${categoria}-desc`).innerText = `R$ ${totalComDesconto.toFixed(2)}`;
+
+                // Gerando texto dos resultados
+                resultadosSemDesconto += `${categoria.split('-')[1].charAt(0).toUpperCase() + categoria.split('-')[1].slice(1)}: ${qtd1}x${valor1.toFixed(2)} + ${qtd2}x${valor2.toFixed(2)} = R$ ${total.toFixed(2)}\n`;
+                resultadosComDesconto += `R$ ${total.toFixed(2)} *-${descontoPercentual}%* = R$ ${totalComDesconto.toFixed(2)}\n`;
+            });
+
+            // Atualizando os blocos de resultados
+            document.getElementById("resultado-final-compacto-1").innerText = resultadosSemDesconto;
+            document.getElementById("resultado-final-compacto-2").innerText = resultadosComDesconto;
+        }
+    </script>
+</body>
+</html>
