@@ -47,16 +47,27 @@
             padding: 10px;
             background-color: #f9f9f9;
         }
+        #meuBotao {
+            background-color: rgb(110, 207, 227); /* Cor de fundo */
+        }
+
+        #meuBotao:hover {
+            background-color: #06ccda; /* Mudança de cor ao passar o mouse */
+        }
+        #meuBotao:active {
+            background-color: #a0e6f1; /* Cor mais clara ao clicar */
+        }
     </style>
 </head>
 <body>
     <h2>Calculadora de 4 Valores 15%</h2>
 
+    <div id="contador-taxas">Taxas aplicadas 0 vezes</div>
     <button type="button" onclick="inverterTaxas()">Remover Taxas</button>
     <label for="taxa">Taxas (%):</label>
     <input type="number" id="taxa" value="10" min="0" max="100" step="1">
     <button type="button" onclick="aplicarTaxas()">Aplicar Taxas</button>
-    <button type="button" onclick="calcular()">Calcular Totais</button>
+    <button id="meuBotao" type="button" onclick="calcular()">Calcular Totais</button>
 
     <table>
         <thead>
@@ -129,6 +140,119 @@
         Texto copiado!
     </div>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        atualizarCoresDosValores();
+        atualizarCorDescontoPercentual();
+        atualizarCorContadorTaxas();
+
+        // Eventos para atualizar as cores dinamicamente
+        const inputsDeValores = document.querySelectorAll('input[type="number"]');
+        inputsDeValores.forEach(input => {
+            input.addEventListener('input', () => {
+                atualizarCoresDosValores();
+                atualizarCorDescontoPercentual();
+            });
+        });
+
+        const inputTaxa = document.getElementById("taxa");
+        inputTaxa.addEventListener("input", atualizarCorContadorTaxas);
+    });
+
+    // Atualiza as cores dos valores (verde e vermelho)
+    function atualizarCoresDosValores() {
+        const categorias = ["simples", "medio", "master"];
+
+        categorias.forEach(categoria => {
+            for (let i = 1; i <= 4; i++) {
+                const valorInput = document.getElementById(`${categoria}-valor${i}`);
+                const valorAtual = parseFloat(valorInput.value) || 0;
+
+                if (valorAtual > 0) {
+                    valorInput.style.color = 'green'; // Verde para valores acima de 0
+                } else {
+                    valorInput.style.color = 'red'; // Vermelho para valores iguais a 0
+                }
+            }
+        });
+    }
+
+    // Atualiza as cores dos descontos percentuais (10%)
+    function atualizarCorDescontoPercentual() {
+        const categorias = ["simples", "medio", "master"];
+
+        categorias.forEach(categoria => {
+            const descontoPercentualElem = document.getElementById(`${categoria}-desc-perc`);
+            if (descontoPercentualElem) {
+                descontoPercentualElem.style.color = 'purple'; // Define a cor roxa para o percentual de desconto
+            }
+        });
+    }
+
+    // Atualiza a cor do contador de taxas (vermelho para 0, verde para 1 ou mais)
+    function atualizarCorContadorTaxas() {
+        const contadorElem = document.getElementById("contador-taxas");
+        const taxaAplicada = parseInt(contadorTaxas) || 0;
+
+        if (taxaAplicada === 0) {
+            contadorElem.style.color = 'red'; // Vermelho quando 0
+        } else {
+            contadorElem.style.color = 'green'; // Verde quando 1 ou mais
+        }
+    }
+
+        // campos de quantidade e valor pulando em sequencia campo em campo
+        document.addEventListener('DOMContentLoaded', () => {
+            // Define a sequência personalizada de campos
+            const sequence = [
+                "simples-qtd1",
+                "medio-qtd1",
+                "master-qtd1",
+                "simples-qtd2",
+                "medio-qtd2",
+                "master-qtd2",
+                "simples-qtd3",
+                "medio-qtd3",
+                "master-qtd3",
+                "simples-qtd4",
+                "medio-qtd4",
+                "master-qtd4",
+                "simples-valor1",
+                "medio-valor1",
+                "master-valor1",
+                "simples-valor2",
+                "medio-valor2",
+                "master-valor2",
+                "simples-valor3",
+                "medio-valor3",
+                "master-valor3",
+                "simples-valor4",
+                "medio-valor4",
+                "master-valor4"
+            ];
+
+            // Adiciona o evento keydown a cada campo da sequência
+            sequence.forEach((id, index) => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault(); // Previne o comportamento padrão do Enter
+                            const nextIndex = (index + 1) % sequence.length; // Move para o próximo campo, ciclando
+                            const nextInput = document.getElementById(sequence[nextIndex]);
+                            if (nextInput) {
+                                nextInput.focus(); // Foca no próximo campo
+                                nextInput.select(); // Seleciona o conteúdo do próximo campo
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+
+          // Variável global para contar o número de vezes que as taxas foram aplicadas
+        let contadorTaxas = 0;
+
         function aplicarTaxas() {
             const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
             const categorias = ["simples", "medio", "master"];
@@ -141,6 +265,11 @@
                     valorInput.value = valorComTaxa.toFixed(2);
                 }
             });
+
+            // Incrementa o contador e exibe
+            contadorTaxas++;
+            document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+            atualizarCorContadorTaxas(); // Atualiza a cor do contador
         }
 
         function inverterTaxas() {
@@ -155,8 +284,13 @@
                     valorInput.value = valorOriginal.toFixed(2);
                 }
             });
-        }
 
+            // Decrementa o contador e atualiza a exibição
+            contadorTaxas--;
+            document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+            atualizarCorContadorTaxas(); // Atualiza a cor do contador
+        }
+        
         function calcular() {
             const categorias = ["simples", "medio", "master"];
             let resultadoTotais = "";
