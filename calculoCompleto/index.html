@@ -4,19 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Descontos e Taxas</title>
+
+    <!-- Adicionando o favicon -->
+    <link rel="icon" type="image/png" href="logoCalc.png">
+
+    <!-- Font Awesome pego no site cdnjs com icones-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+        }
+        /* Estilo para o cabeçalho */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 2px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        /* Estilo da logo com link */
+        .header img {
+            height: 50px;
+            transition: transform 0.2s ease; /* Transição suave para hover */
+        }
+
+        .header img:hover {
+            transform: scale(1.05); /* Aumenta um pouco ao passar o mouse */
+        }
+
+        .header a {
+            text-decoration: none;
+            color: #888; /* Ícone cinza inicialmente */
+            font-size: 24px;
+            transition: color 0.2s ease, transform 0.2s ease; /* Transição suave */
+        }
+
+        .header a:hover {
+            color: #000; /* Ícone preto ao passar o mouse */
+            transform: scale(1.2); /* Aumenta um pouco */
         }
         iframe {
             width: 100%;
             height: 580px;
             border: none;
         }
+
+        /* Estilo para o footer */
+        .footer__copy {
+            font-size: 14px;
+            text-align: center;
+            color: #555;
+            margin-top: 20px;
+        }
+
+        .footer__copy a {
+            color: #007BFF; /* Azul para o link */
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease; /* Transição suave */
+        }
+
+        .footer__copy a:hover {
+            color: #0056b3; /* Azul mais escuro ao passar o mouse */
+        }
     </style>
 </head>
 <body>
+    <!-- Cabeçalho com logo e ícone -->
+    <div class="header">
+        <!-- Logo no lado esquerdo -->
+       <!-- Logo com link -->
+       <a href="https://www.lobohotel.com.br/" target="_blank">
+        <img src="logo.png" alt="Logo">
+    </a>
+
+        <!-- Ícone no lado direito -->
+        <a href="https://rafaellinolobo-portfolio.netlify.app/" target="_blank">
+            <i class="fab fa-usb"></i>
+        </a>
+    </div>
     <!-- <h2>Calculadora de Descontos e Taxas</h2> -->
 
     <!-- Incluindo o 1 formulário -->
@@ -30,5 +99,10 @@
 
     <!-- Incluindo o 3 formulário -->
     <iframe src="valorPorcento.html" title="Formulário com 3 valores"></iframe>
+
+    <!-- Footer com link -->
+    <p class="footer__copy">
+        © 2024 <a href="https://rafaellinolobo-portfolio.netlify.app/" target="_blank">RafaelLinoLobo</a> - All Rights Reserved.
+    </p>
 </body>
 </html>

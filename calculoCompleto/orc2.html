@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Descontos e Taxas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            color: rgb(192, 196, 3); /* Aqui você pode usar o nome da cor, um código hexadecimal (#ff0000), ou RGB */
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 5px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        input {
+            width: 60px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .resultado {
+            background-color: #fdf4c7;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        #resultado-final, #resultado-descontos {
+            margin-top: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            font-size: 14px;
+            border: 1px solid black;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            margin-right: 5px;
+        }
+        .form-group input {
+            margin-right: 10px;
+        }
+        .input-largo {
+    width: 300px; /* Ajuste para o tamanho desejado */
+    font-size: 14px;
+}
+    </style>
+</head>
+<body>
+    <h2>Calculadora de 4 Valores 15%</h2>
+    <div class="form-group">
+        <label for="data-entrada">Data de Entrada:</label>
+        <input type="date" id="data-entrada">
+
+        <label for="data-saida">Data de Saída:</label>
+        <input type="date" id="data-saida">
+
+        <label for="numero-pessoas">Número de Pessoas:</label>
+        <input type="number" id="numero-pessoas" value="1" min="1">
+
+        <label for="adicional-info">Adicional:</label>
+        <input type="text" id="adicional-info" class="input-largo" placeholder="Ex: free, casal, camas separadas">
+    </div>
+
+    <div id="contador-taxas">Taxas aplicadas 0 vezes</div>
+    <button type="button" onclick="inverterTaxas()">Remover Taxas</button>
+    <label for="taxa">Taxas (%):</label>
+    <input type="number" id="taxa" value="10" min="0" max="100" step="1">
+    <button type="button" onclick="aplicarTaxas()">Aplicar Taxas</button>
+    <button id="meuBotao" type="button" onclick="calcular()">Calcular Totais</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Categoria</th>
+                <th>Dias 1</th>
+                <th>Valor 1</th>
+                <th>Dias 2</th>
+                <th>Valor 2</th>
+                <th>Dias 3</th>
+                <th>Valor 3</th>
+                <th>Dias 4</th>
+                <th>Valor 4</th>
+                <th>Total</th>
+                <th>Desconto (%)</th>
+                <th>Com Desconto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Simples</td>
+                <td><input type="number" id="simples-qtd1" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="simples-qtd2" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor2" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="simples-qtd3" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor3" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="simples-qtd4" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor4" value="0" min="0" step="0.01"></td>
+                <td class="resultado" id="simples-total">R$ 0,00</td>
+                <td><input type="number" id="simples-desc-perc" value="15" min="0" max="100" step="5">%</td>
+                <td class="resultado" id="simples-desc">R$ 0,00</td>
+            </tr>
+            <tr>
+                <td>Médio</td>
+                <td><input type="number" id="medio-qtd1" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="medio-qtd2" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor2" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="medio-qtd3" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor3" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="medio-qtd4" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor4" value="0" min="0" step="0.01"></td>
+                <td class="resultado" id="medio-total">R$ 0,00</td>
+                <td><input type="number" id="medio-desc-perc" value="15" min="0" max="100" step="5">%</td>
+                <td class="resultado" id="medio-desc">R$ 0,00</td>
+            </tr>
+            <tr>
+                <td>Master</td>
+                <td><input type="number" id="master-qtd1" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="master-qtd2" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor2" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="master-qtd3" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor3" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="master-qtd4" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor4" value="0" min="0" step="0.01"></td>
+                <td class="resultado" id="master-total">R$ 0,00</td>
+                <td><input type="number" id="master-desc-perc" value="15" min="0" max="100" step="5">%</td>
+                <td class="resultado" id="master-desc">R$ 0,00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="resultado-final"></div>
+    <button onclick="copiarTexto('resultado-final')">Copiar resultado</button>
+    <script>
+
+    // Atualiza a cor do contador de taxas (vermelho para 0, verde para 1 ou mais)
+    function atualizarCorContadorTaxas() {
+        const contadorElem = document.getElementById("contador-taxas");
+        const taxaAplicada = parseInt(contadorTaxas) || 0;
+
+        if (taxaAplicada === 0) {
+            contadorElem.style.color = 'red'; // Vermelho quando 0
+        } else {
+            contadorElem.style.color = 'green'; // Verde quando 1 ou mais
+        }
+    }
+
+        function aplicarTaxas() {
+            const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+            const categorias = ["simples", "medio", "master"];
+
+            categorias.forEach(categoria => {
+                for (let i = 1; i <= 4; i++) {
+                    const valorInput = document.getElementById(`${categoria}-valor${i}`);
+                    const valorAtual = parseFloat(valorInput.value) || 0;
+                    const valorComTaxa = valorAtual + (valorAtual * (taxaPercentual / 100));
+                    valorInput.value = valorComTaxa.toFixed(2);
+                }
+            });
+
+            // Incrementa o contador e exibe
+            contadorTaxas++;
+            document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+            atualizarCorContadorTaxas(); // Atualiza a cor do contador
+        }
+
+        function inverterTaxas() {
+            const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+            const divisor = 1 + (taxaPercentual / 100);
+
+            ["simples", "medio", "master"].forEach(categoria => {
+                for (let i = 1; i <= 4; i++) {
+                    const valorInput = document.getElementById(`${categoria}-valor${i}`);
+                    const valorAtual = parseFloat(valorInput.value) || 0;
+                    const valorOriginal = valorAtual / divisor;
+                    valorInput.value = valorOriginal.toFixed(2);
+                }
+            });
+
+            // Decrementa o contador e atualiza a exibição
+            contadorTaxas--;
+            document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+            atualizarCorContadorTaxas(); // Atualiza a cor do contador
+        }
+        
+        function calcular() {
+        const categorias = ["simples", "medio", "master"];
+        let resultadoFinal = "Categoria \t TOTAL\n";
+        let resultadoDescontos = "TOTAL \t Total c/ desc.\n";
+
+        categorias.forEach(categoria => {
+            let total = 0;
+            let totalComDesconto = 0;
+            let descontoPercentual = parseFloat(document.getElementById(`${categoria}-desc-perc`).value) || 0;
+            let detalhes = ""; // Armazena os detalhes válidos para exibição
+            let esgotado = true; // Flag para verificar se todos os valores são zero
+
+            for (let i = 1; i <= 4; i++) {
+                const qtd = parseFloat(document.getElementById(`${categoria}-qtd${i}`).value) || 0;
+                const valor = parseFloat(document.getElementById(`${categoria}-valor${i}`).value) || 0;
+
+                if (qtd > 0 && valor > 0) { // Apenas considera valores válidos
+                    esgotado = false; // Se houver valores válidos, não está esgotado
+                    detalhes += `${qtd}x${valor.toFixed(2)} + `;
+                    total += qtd * valor;
+                }
+            }
+
+            if (!esgotado) {
+                // Se houver detalhes válidos
+                detalhes = detalhes.slice(0, -3); // Remove o último "+"
+                totalComDesconto = total - (total * (descontoPercentual / 100));
+
+                // Adiciona o total por categoria
+                resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = R$ ${total.toFixed(2)}\n`;
+                // Adiciona o cálculo com desconto
+                resultadoDescontos += `R$ ${total.toFixed(2)} *-${descontoPercentual}%* = R$ ${totalComDesconto.toFixed(2)}\n`;
+
+                // Atualiza os campos na tabela
+                document.getElementById(`${categoria}-total`).innerText = `R$ ${total.toFixed(2)}`;
+                document.getElementById(`${categoria}-desc`).innerText = `R$ ${totalComDesconto.toFixed(2)}`;
+            } else {
+                // Caso todos os valores sejam zero
+                resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
+                document.getElementById(`${categoria}-total`).innerText = "Esgotado";
+                document.getElementById(`${categoria}-desc`).innerText = "-";
+            }
+        });
+
+        // Combina os resultados de totais e descontos
+        const resultadoCompleto = resultadoFinal + "\n" + resultadoDescontos;
+
+        // Exibe o resultado combinado no elemento
+        document.getElementById("resultado-final").innerText = resultadoCompleto || "Nenhuma categoria válida.";
+    }
+
+
+        function copiarTexto(elementoId) {
+            const elemento = document.getElementById(elementoId);
+            const texto = elemento.innerText;
+
+            if (texto.trim() !== "") {
+                navigator.clipboard.writeText(texto)
+                    .then(() => {
+                        exibirAlerta("Texto copiado!");
+                    })
+                    .catch(err => {
+                        console.error("Erro ao copiar texto: ", err);
+                    });
+            } else {
+                exibirAlerta("Nada para copiar!");
+            }
+        }
+
+
+    </script>
+</body>
+</html>
