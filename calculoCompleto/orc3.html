@@ -112,108 +112,133 @@
             </tr>
         </tbody>
     </table>
+    <!-- Campo de Seleção -->
+    <label for="opcoes">Escolha uma opção:</label>
+    <select id="opcoes">
+        <option value="hoje">Hoje</option>
+        <option value="umaDiaria">Uma Diária</option>
+        <option value="cinquenta">50%</option>
+        <option value="cinquentaPromocao">50% com Promoção</option>
+    </select>
 
     <div id="resultado-final"></div>
     <button onclick="copiarTexto('resultado-final')">Copiar resultado</button>
     <script>
+let contadorTaxas = 0; // Contador para controlar as taxas aplicadas
+
 function calcular() {
-        const categorias = ["simples", "medio", "master"];
-        let resultadoFinal = "Categoria \t TOTAL\n";
-        let resultadoDescontos = "TOTAL \t Total c/ desc.\n";
+    const categorias = ["simples", "medio", "master"];
+    const dataEntrada = document.getElementById("data-entrada").value;
+    const dataSaida = document.getElementById("data-saida").value;
+    const numeroPessoas = parseInt(document.getElementById("numero-pessoas").value) || 1;
+    const adicional = document.getElementById("adicional-info").value.trim() || " ";
+    const temTaxa = contadorTaxas > 0; // Verifica se as taxas foram aplicadas
 
-        categorias.forEach(categoria => {
-            let total = 0;
-            let totalComDesconto = 0;
-            let descontoPercentual = parseFloat(document.getElementById(`${categoria}-desc-perc`).value) || 0;
-            let detalhes = ""; // Armazena os detalhes válidos para exibição
-            let esgotado = true; // Flag para verificar se todos os valores são zero
-
-            for (let i = 1; i <= 4; i++) {
-                const qtd = parseFloat(document.getElementById(`${categoria}-qtd${i}`).value) || 0;
-                const valor = parseFloat(document.getElementById(`${categoria}-valor${i}`).value) || 0;
-
-                if (qtd > 0 && valor > 0) { // Apenas considera valores válidos
-                    esgotado = false; // Se houver valores válidos, não está esgotado
-                    detalhes += `${qtd}x${valor.toFixed(2)} + `;
-                    total += qtd * valor;
-                }
-            }
-            if (!esgotado) {
-                // Se houver detalhes válidos
-                detalhes = detalhes.slice(0, -3); // Remove o último "+"
-                totalComDesconto = total - (total * (descontoPercentual / 100));
-
-                // Adiciona o total por categoria
-                resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = R$ ${total.toFixed(2)}\n`;
-                // Adiciona o cálculo com desconto
-                resultadoDescontos += `R$ ${total.toFixed(2)} *-${descontoPercentual}%* = R$ ${totalComDesconto.toFixed(2)}\n`;
-
-                // Atualiza os campos na tabela
-                document.getElementById(`${categoria}-total`).innerText = `R$ ${total.toFixed(2)}`;
-                document.getElementById(`${categoria}-desc`).innerText = `R$ ${totalComDesconto.toFixed(2)}`;
-            } else {
-                // Caso todos os valores sejam zero
-                resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
-                document.getElementById(`${categoria}-total`).innerText = "Esgotado";
-                document.getElementById(`${categoria}-desc`).innerText = "-";
-            }
-        });
-
-        // Combina os resultados de totais e descontos
-        const resultadoCompleto = resultadoFinal + "\n" + resultadoDescontos;
-
-        // Exibe o resultado combinado no elemento
-        document.getElementById("resultado-final").innerText = resultadoCompleto || "Nenhuma categoria válida.";
+    if (!dataEntrada || !dataSaida) {
+        alert("Por favor, preencha as datas de entrada e saída.");
+        return;
     }
 
-    // Atualiza a cor do contador de taxas (vermelho para 0, verde para 1 ou mais)
-    function atualizarCorContadorTaxas() {
-        const contadorElem = document.getElementById("contador-taxas");
-        const taxaAplicada = parseInt(contadorTaxas) || 0;
+    // Cabeçalho do orçamento
+    let periodo = `Orçamento de período ${dataEntrada.split("-").reverse().join("/")} a ${dataSaida.split("-").reverse().join("/")}, para ${numeroPessoas.toString().padStart(2, '0')} pessoa(s) ${adicional}`;
+    periodo += temTaxa ? ", já com taxas inclusas:\n\n" : ":\n\n";
 
-        if (taxaAplicada === 0) {
-            contadorElem.style.color = 'red'; // Vermelho quando 0
+    let resultadoFinal = "Categoria \t TOTAL\n";
+    let resultadoDescontos = "TOTAL \t Total c/ desc.\n";
+
+    categorias.forEach(categoria => {
+        let total = 0;
+        let totalComDesconto = 0;
+        let descontoPercentual = parseFloat(document.getElementById(`${categoria}-desc-perc`).value) || 0;
+        let detalhes = ""; // Detalhes para a linha
+        let esgotado = true;
+
+        for (let i = 1; i <= 4; i++) {
+            const qtd = parseFloat(document.getElementById(`${categoria}-qtd${i}`).value) || 0;
+            const valor = parseFloat(document.getElementById(`${categoria}-valor${i}`).value) || 0;
+
+            if (qtd > 0 && valor > 0) {
+                esgotado = false;
+                detalhes += `${qtd}x${valor.toFixed(2)} + `;
+                total += qtd * valor;
+            }
+        }
+
+        if (!esgotado) {
+            detalhes = detalhes.slice(0, -3); // Remove o último "+"
+            totalComDesconto = total - (total * (descontoPercentual / 100));
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = R$ ${total.toFixed(2)}\n`;
+            resultadoDescontos += `R$ ${total.toFixed(2)} *-${descontoPercentual}%* = R$ ${totalComDesconto.toFixed(2)}\n`;
+
+            // Atualiza a tabela
+            document.getElementById(`${categoria}-total`).innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById(`${categoria}-desc`).innerText = `R$ ${totalComDesconto.toFixed(2)}`;
         } else {
-            contadorElem.style.color = 'green'; // Verde quando 1 ou mais
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
+            document.getElementById(`${categoria}-total`).innerText = "Esgotado";
+            document.getElementById(`${categoria}-desc`).innerText = "-";
         }
+    });
+
+    let taxaServico = temTaxa ? "" : "\n*É cobrado mais 10% Taxa Serviço*";
+    const resultadoCompleto = periodo + resultadoFinal + "\n" + resultadoDescontos + taxaServico;
+
+    document.getElementById("resultado-final").innerText = resultadoCompleto || "Nenhuma categoria válida.";
+}
+
+function aplicarTaxas() {
+    const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+    const categorias = ["simples", "medio", "master"];
+
+    categorias.forEach(categoria => {
+        for (let i = 1; i <= 4; i++) {
+            const valorInput = document.getElementById(`${categoria}-valor${i}`);
+            const valorAtual = parseFloat(valorInput.value) || 0;
+            const valorComTaxa = valorAtual + (valorAtual * (taxaPercentual / 100));
+            valorInput.value = valorComTaxa.toFixed(2);
+        }
+    });
+
+    contadorTaxas++;
+    document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+    atualizarCorContadorTaxas();
+}
+
+function inverterTaxas() {
+    const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+    const divisor = 1 + (taxaPercentual / 100);
+
+    ["simples", "medio", "master"].forEach(categoria => {
+        for (let i = 1; i <= 4; i++) {
+            const valorInput = document.getElementById(`${categoria}-valor${i}`);
+            const valorAtual = parseFloat(valorInput.value) || 0;
+            const valorOriginal = valorAtual / divisor;
+            valorInput.value = valorOriginal.toFixed(2);
+        }
+    });
+
+    contadorTaxas--;
+    document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+    atualizarCorContadorTaxas();
+}
+
+function atualizarCorContadorTaxas() {
+    const contadorElem = document.getElementById("contador-taxas");
+    contadorElem.style.color = contadorTaxas > 0 ? 'green' : 'red';
+}
+
+function copiarTexto(elementoId) {
+    const elemento = document.getElementById(elementoId);
+    const texto = elemento.innerText;
+
+    if (texto.trim() !== "") {
+        navigator.clipboard.writeText(texto)
+            .then(() => alert("Texto copiado!"))
+            .catch(err => console.error("Erro ao copiar texto: ", err));
+    } else {
+        alert("Nada para copiar!");
     }
-
-        function aplicarTaxas() {
-            const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
-            const categorias = ["simples", "medio", "master"];
-
-            categorias.forEach(categoria => {
-                for (let i = 1; i <= 4; i++) {
-                    const valorInput = document.getElementById(`${categoria}-valor${i}`);
-                    const valorAtual = parseFloat(valorInput.value) || 0;
-                    const valorComTaxa = valorAtual + (valorAtual * (taxaPercentual / 100));
-                    valorInput.value = valorComTaxa.toFixed(2);
-                }
-            });
-
-            // Incrementa o contador e exibe
-            contadorTaxas++;
-            document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
-            atualizarCorContadorTaxas(); // Atualiza a cor do contador
-        }
-
-        function inverterTaxas() {
-            const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
-            const divisor = 1 + (taxaPercentual / 100);
-
-            ["simples", "medio", "master"].forEach(categoria => {
-                for (let i = 1; i <= 4; i++) {
-                    const valorInput = document.getElementById(`${categoria}-valor${i}`);
-                    const valorAtual = parseFloat(valorInput.value) || 0;
-                    const valorOriginal = valorAtual / divisor;
-                    valorInput.value = valorOriginal.toFixed(2);
-                }
-            });
-            // Decrementa o contador e atualiza a exibição
-            contadorTaxas--;
-            document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
-            atualizarCorContadorTaxas(); // Atualiza a cor do contador
-        }
+}
         function copiarTexto(elementoId) {
             const elemento = document.getElementById(elementoId);
             const texto = elemento.innerText;

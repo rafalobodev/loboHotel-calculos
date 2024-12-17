@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Descontos e Taxas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            color: rgb(192, 196, 3); /* Aqui você pode usar o nome da cor, um código hexadecimal (#ff0000), ou RGB */
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 5px;
+        }
+        input {
+            width: 60px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .input-largo {
+            width: 300px; /* Ajuste para o tamanho desejado */
+            font-size: 14px;
+        }
+        .resultado {
+            background-color: #fdf4c7;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        #resultado-final, #resultado-descontos {
+            margin-top: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            font-size: 14px;
+            border: 1px solid black;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        #meuBotao {
+            background-color: rgb(110, 207, 227); /* Cor de fundo */
+        }
+
+        #meuBotao:hover {
+            background-color: #06ccda; /* Mudança de cor ao passar o mouse */
+        }
+        #meuBotao:active {
+            background-color: #a0e6f1; /* Cor mais clara ao clicar */
+        }
+
+    </style>
+</head>
+<body>
+    <h2>Calculadora</h2>
+    <div class="form-group">
+        <label for="data-entrada">Data de Entrada:</label>
+        <input type="date" id="data-entrada">
+        <label for="data-saida">Data de Saída:</label>
+        <input type="date" id="data-saida">
+        <label for="numero-pessoas">Número de Pessoas:</label>
+        <input type="number" id="numero-pessoas" value="1" min="1">
+        <label for="adicional-info">Adicional:</label>
+        <input type="text" id="adicional-info" class="input-largo" placeholder="Ex: free, casal, camas separadas">
+    </div>
+
+    <div id="contador-taxas">Taxas aplicadas 0 vezes</div>
+    <button type="button" onclick="inverterTaxas()">Remover Taxas</button>
+    <label for="taxa">Taxas (%):</label>
+    <input type="number" id="taxa" value="10" min="0" max="100" step="1">
+    <button type="button" onclick="aplicarTaxas()">Aplicar Taxas</button>
+    <button id="meuBotao" type="button" onclick="calcular()">Calcular Totais</button>
+    <!-- Campo de Seleção -->
+    <label for="opcoes">Tipo orçamento:</label>
+    <select id="opcoes">
+        <option value="hoje">Hoje</option>
+        <option value="umaDiaria">Uma Diária</option>
+        <option value="cinquenta">50%</option>
+        <option value="cinquentaPromocao">50% com Promoção</option>
+    </select>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Categoria</th>
+                <th>Dias 1</th>
+                <th>Valor 1</th>
+                <th>Dias 2</th>
+                <th>Valor 2</th>
+                <th>Dias 3</th>
+                <th>Valor 3</th>
+                <th>Dias 4</th>
+                <th>Valor 4</th>
+                <th>Total</th>
+                <th>Desconto (%)</th>
+                <th>Com Desconto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Simples</td>
+                <td><input type="number" id="simples-qtd1" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="simples-qtd2" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor2" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="simples-qtd3" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor3" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="simples-qtd4" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor4" value="0" min="0" step="0.01"></td>
+                <td class="resultado" id="simples-total">R$ 0,00</td>
+                <td><input type="number" id="simples-desc-perc" value="15" min="0" max="100" step="5">%</td>
+                <td class="resultado" id="simples-desc">R$ 0,00</td>
+            </tr>
+            <tr>
+                <td>Médio</td>
+                <td><input type="number" id="medio-qtd1" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="medio-qtd2" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor2" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="medio-qtd3" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor3" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="medio-qtd4" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor4" value="0" min="0" step="0.01"></td>
+                <td class="resultado" id="medio-total">R$ 0,00</td>
+                <td><input type="number" id="medio-desc-perc" value="15" min="0" max="100" step="5">%</td>
+                <td class="resultado" id="medio-desc">R$ 0,00</td>
+            </tr>
+            <tr>
+                <td>Master</td>
+                <td><input type="number" id="master-qtd1" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="master-qtd2" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor2" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="master-qtd3" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor3" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="master-qtd4" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor4" value="0" min="0" step="0.01"></td>
+                <td class="resultado" id="master-total">R$ 0,00</td>
+                <td><input type="number" id="master-desc-perc" value="15" min="0" max="100" step="5">%</td>
+                <td class="resultado" id="master-desc">R$ 0,00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="resultado-final"></div>
+    <button onclick="copiarTexto('resultado-final')">Copiar resultado</button>
+    <div id="alerta-copiar" style="display: none; position: fixed; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
+        Texto copiado!
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        atualizarCoresDosValores();
+        atualizarCorDescontoPercentual();
+        atualizarCorContadorTaxas();
+
+        // Eventos para atualizar as cores dinamicamente
+        const inputsDeValores = document.querySelectorAll('input[type="number"]');
+        inputsDeValores.forEach(input => {
+            input.addEventListener('input', () => {
+                atualizarCoresDosValores();
+                atualizarCorDescontoPercentual();
+            });
+        });
+
+        const inputTaxa = document.getElementById("taxa");
+        inputTaxa.addEventListener("input", atualizarCorContadorTaxas);
+    });
+
+    // Atualiza as cores dos valores (verde e vermelho)
+    function atualizarCoresDosValores() {
+        const categorias = ["simples", "medio", "master"];
+
+        categorias.forEach(categoria => {
+            for (let i = 1; i <= 4; i++) {
+                const valorInput = document.getElementById(`${categoria}-valor${i}`);
+                const valorAtual = parseFloat(valorInput.value) || 0;
+
+                if (valorAtual > 0) {
+                    valorInput.style.color = 'green'; // Verde para valores acima de 0
+                } else {
+                    valorInput.style.color = 'red'; // Vermelho para valores iguais a 0
+                }
+            }
+        });
+    }
+
+    // Atualiza as cores dos descontos percentuais (10%)
+    function atualizarCorDescontoPercentual() {
+        const categorias = ["simples", "medio", "master"];
+
+        categorias.forEach(categoria => {
+            const descontoPercentualElem = document.getElementById(`${categoria}-desc-perc`);
+            if (descontoPercentualElem) {
+                descontoPercentualElem.style.color = 'purple'; // Define a cor roxa para o percentual de desconto
+            }
+        });
+    }
+
+    // Atualiza a cor do contador de taxas (vermelho para 0, verde para 1 ou mais)
+    function atualizarCorContadorTaxas() {
+        const contadorElem = document.getElementById("contador-taxas");
+        const taxaAplicada = parseInt(contadorTaxas) || 0;
+
+        if (taxaAplicada === 0) {
+            contadorElem.style.color = 'red'; // Vermelho quando 0
+        } else {
+            contadorElem.style.color = 'green'; // Verde quando 1 ou mais
+        }
+    }
+
+     // campos de quantidade e valor pulando em sequencia campo em campo
+     document.addEventListener('DOMContentLoaded', () => {
+            // Define a sequência personalizada de campos
+            const sequence = [
+                "simples-qtd1",
+                "medio-qtd1",
+                "master-qtd1",
+                "simples-qtd2",
+                "medio-qtd2",
+                "master-qtd2",
+                "simples-qtd3",
+                "medio-qtd3",
+                "master-qtd3",
+                "simples-qtd4",
+                "medio-qtd4",
+                "master-qtd4",
+                "simples-valor1",
+                "medio-valor1",
+                "master-valor1",
+                "simples-valor2",
+                "medio-valor2",
+                "master-valor2",
+                "simples-valor3",
+                "medio-valor3",
+                "master-valor3",
+                "simples-valor4",
+                "medio-valor4",
+                "master-valor4"
+            ];
+
+            // Adiciona o evento keydown a cada campo da sequência
+            sequence.forEach((id, index) => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault(); // Previne o comportamento padrão do Enter
+                            const nextIndex = (index + 1) % sequence.length; // Move para o próximo campo, ciclando
+                            const nextInput = document.getElementById(sequence[nextIndex]);
+                            if (nextInput) {
+                                nextInput.focus(); // Foca no próximo campo
+                                nextInput.select(); // Seleciona o conteúdo do próximo campo
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+let contadorTaxas = 0; // Contador para controlar as taxas aplicadas
+
+function calcular() {
+    const categorias = ["simples", "medio", "master"];
+    const dataEntrada = document.getElementById("data-entrada").value;
+    const dataSaida = document.getElementById("data-saida").value;
+    const numeroPessoas = parseInt(document.getElementById("numero-pessoas").value) || 1;
+    const descontoPercentualsimples = parseInt(document.getElementById("simples-desc-perc").value);
+    const adicional = document.getElementById("adicional-info").value.trim() || " ";
+    const temTaxa = contadorTaxas > 0; // Verifica se as taxas foram aplicadas
+    // Captura a opção selecionada
+    const opcao = document.getElementById("opcoes").value;
+    // Textos pré-definidos para cada opção
+    const textos = {
+            hoje: `O restante no check-in em dinheiro ou pix ganha ${descontoPercentualsimples}% de desconto.
+        Com o desconto para pagamento em dinheiro fica:`,
+            umaDiaria: `Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pagamento em dinheiro fica:`,
+            cinquenta: `Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia 24/12.
+        No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
+        Com desconto fica:`,
+            cinquentaPromocao: `Estamos com promoção para o verão! Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia 24/12.
+        No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
+        Com desconto fica:`
+    };
+    if (!dataEntrada || !dataSaida) {
+        alert("Por favor, preencha as datas de entrada e saída.");
+        return;
+    }
+
+    // Cabeçalho do orçamento
+    let periodo = `Orçamento de período ${dataEntrada.split("-").reverse().join("/")} a ${dataSaida.split("-").reverse().join("/")}, para ${numeroPessoas.toString().padStart(2, '0')} pessoa(s) ${adicional}`;
+    periodo += temTaxa ? ", já com taxas inclusas:\n" : ":\n";
+
+    let resultadoFinal = "Categoria \t TOTAL\n";
+    let resultadoDescontos = "TOTAL \t Total c/ desc.\n";
+
+    categorias.forEach(categoria => {
+        let total = 0;
+        let totalComDesconto = 0;
+        let descontoPercentual = parseFloat(document.getElementById(`${categoria}-desc-perc`).value) || 0;
+        let detalhes = ""; // Detalhes para a linha
+        let esgotado = true;
+
+        for (let i = 1; i <= 4; i++) {
+            const qtd = parseFloat(document.getElementById(`${categoria}-qtd${i}`).value) || 0;
+            const valor = parseFloat(document.getElementById(`${categoria}-valor${i}`).value) || 0;
+
+            if (qtd > 0 && valor > 0) {
+                esgotado = false;
+                detalhes += `${qtd}x${valor.toFixed(2)} + `;
+                total += qtd * valor;
+            }
+        }
+
+        if (!esgotado) {
+            detalhes = detalhes.slice(0, -3); // Remove o último "+"
+            totalComDesconto = total - (total * (descontoPercentual / 100));
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = R$ ${total.toFixed(2)}\n`;
+            resultadoDescontos += `R$ ${total.toFixed(2)} *-${descontoPercentual}%* = R$ ${totalComDesconto.toFixed(2)}\n`;
+
+            // Atualiza a tabela
+            document.getElementById(`${categoria}-total`).innerText = `R$ ${total.toFixed(2)}`;
+            document.getElementById(`${categoria}-desc`).innerText = `R$ ${totalComDesconto.toFixed(2)}`;
+        } else {
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
+            document.getElementById(`${categoria}-total`).innerText = "Esgotado";
+            document.getElementById(`${categoria}-desc`).innerText = "-";
+        }
+    });
+
+    // Insere o texto explicativo da opção selecionada
+    const textoExplicativo = textos[opcao] || "";
+
+    let taxaServico = temTaxa ? "" : "\*É cobrado mais 10% Taxa Serviço*";
+    let check = `\nTambém aceitamos cartão de débito e crédito (Parcelamos em até 12x sem juros com parcela mínima de R$100,00)
+    \🛎️O nosso Check-in é a partir das 15:45h e o Check-out até as 12:00h.
+    \*Orçamento válido por dez dias.*`;
+
+    const resultadoCompleto = periodo + resultadoFinal + "\n" + textoExplicativo + "\n" + resultadoDescontos + taxaServico + check;
+
+    document.getElementById("resultado-final").innerText = resultadoCompleto || "Nenhuma categoria válida.";
+}
+
+function aplicarTaxas() {
+    const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+    const categorias = ["simples", "medio", "master"];
+
+    categorias.forEach(categoria => {
+        for (let i = 1; i <= 4; i++) {
+            const valorInput = document.getElementById(`${categoria}-valor${i}`);
+            const valorAtual = parseFloat(valorInput.value) || 0;
+            const valorComTaxa = valorAtual + (valorAtual * (taxaPercentual / 100));
+            valorInput.value = valorComTaxa.toFixed(2);
+        }
+    });
+
+    contadorTaxas++;
+    document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+    atualizarCorContadorTaxas();
+}
+
+function inverterTaxas() {
+    const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+    const divisor = 1 + (taxaPercentual / 100);
+
+    ["simples", "medio", "master"].forEach(categoria => {
+        for (let i = 1; i <= 4; i++) {
+            const valorInput = document.getElementById(`${categoria}-valor${i}`);
+            const valorAtual = parseFloat(valorInput.value) || 0;
+            const valorOriginal = valorAtual / divisor;
+            valorInput.value = valorOriginal.toFixed(2);
+        }
+    });
+
+    contadorTaxas--;
+    document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+    atualizarCorContadorTaxas();
+}
+
+function atualizarCorContadorTaxas() {
+    const contadorElem = document.getElementById("contador-taxas");
+    contadorElem.style.color = contadorTaxas > 0 ? 'green' : 'red';
+}
+
+// function copiarTexto(elementoId) {
+//     const elemento = document.getElementById(elementoId);
+//     const texto = elemento.innerText;
+
+//     if (texto.trim() !== "") {
+//         navigator.clipboard.writeText(texto)
+//             .then(() => alert("Texto copiado!"))
+//             .catch(err => console.error("Erro ao copiar texto: ", err));
+//     } else {
+//         alert("Nada para copiar!");
+//     }
+// }
+//         function copiarTexto(elementoId) {
+//             const elemento = document.getElementById(elementoId);
+//             const texto = elemento.innerText;
+
+//             if (texto.trim() !== "") {
+//                 navigator.clipboard.writeText(texto)
+//                     .then(() => {
+//                         exibirAlerta("Texto copiado!");
+//                     })
+//                     .catch(err => {
+//                         console.error("Erro ao copiar texto: ", err);
+//                     });
+//             } else {
+//                 exibirAlerta("Nada para copiar!");
+//             }
+//         }
+
+        function copiarTexto(elementoId) {
+            const elemento = document.getElementById(elementoId);
+            const texto = elemento.innerText;
+
+            if (texto.trim() !== "") {
+                navigator.clipboard.writeText(texto)
+                    .then(() => {
+                        exibirAlerta("Texto copiado!");
+                    })
+                    .catch(err => {
+                        console.error("Erro ao copiar texto: ", err);
+                    });
+            } else {
+                exibirAlerta("Nada para copiar!");
+            }
+        }
+
+        function exibirAlerta(mensagem) {
+            const alerta = document.getElementById("alerta-copiar");
+            alerta.innerText = mensagem;
+            alerta.style.display = "block";
+
+            // Oculta o alerta após 1 segundo
+            setTimeout(() => {
+                alerta.style.display = "none";
+            }, 1000);
+        }
+
+
+    </script>
+</body>
+</html>

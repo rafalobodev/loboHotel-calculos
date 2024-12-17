@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Descontos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            color: rgb(192, 196, 3);
+        }
+        select, button, textarea {
+            margin: 10px 0;
+            display: block;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            resize: none;
+            font-size: 16px;
+            padding: 10px;
+        }
+        button {
+            background-color: rgb(3, 140, 3);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: rgb(2, 90, 2);
+        }
+    </style>
+</head>
+<body>
+    <h2>Calculadora de Totais</h2>
+
+    <!-- Campo de Seleção -->
+    <label for="opcoes">Escolha uma opção:</label>
+    <select id="opcoes">
+        <option value="hoje">Hoje</option>
+        <option value="umaDiaria">Uma Diária</option>
+        <option value="cinquenta">50%</option>
+        <option value="cinquentaPromocao">50% com Promoção</option>
+    </select>
+
+    <!-- Botão de Calcular -->
+    <button onclick="calcularTotais()">Calcular Totais</button>
+
+    <!-- Área de Resultado -->
+    <textarea id="resultado" placeholder="O resultado aparecerá aqui..." readonly></textarea>
+
+    <script>
+        function calcularTotais() {
+            const opcao = document.getElementById("opcoes").value; // Captura a opção selecionada
+            const resultado = document.getElementById("resultado");
+
+            // Textos pré-definidos para cada opção
+            const textos = {
+                hoje: `
+O restante no check-in em dinheiro ou pix ganha -15% de desconto.
+Com o desconto para pagamento em dinheiro fica:
+                `,
+                umaDiaria: `
+Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
+*O restante no check-in em dinheiro espécie ganha 10% de desconto*.
+Com o desconto para pagamento em dinheiro fica:
+                `,
+                cinquenta: `
+Ofertamos 20% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia 24/12. 
+No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
+Com desconto fica:
+                `,
+                cinquentaPromocao: `
+Estamos com promoção para o verão! Ofertamos 20% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia 24/12. 
+No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
+Com desconto fica:
+                `
+            };
+
+            // Exibe o texto correspondente à opção
+            resultado.value = textos[opcao];
+        }
+    </script>
+</body>
+</html>
