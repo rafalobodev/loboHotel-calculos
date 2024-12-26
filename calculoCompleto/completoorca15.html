@@ -62,7 +62,7 @@
     </style>
 </head>
 <body>
-    <h2>Calculadora</h2>
+    <h2>Orçamento completo</h2>
     <div class="form-group">
         <label for="data-entrada">Data de Entrada:</label>
         <input type="date" id="data-entrada">
@@ -84,11 +84,12 @@
     <label for="opcoes">Tipo orçamento:</label>
     <select id="opcoes">
         <option value="hoje">Hoje</option>
-        <option value="umaDiaria">Uma Diária</option>
-        <option value="cinquenta">50%</option>
-        <option value="cinquentaPromocao">50% com Promoção</option>
+        <option value="umaDiaria">*uma diária* antecipada</option>
+        <option value="cinquenta">50% total antecipada até</option>
+        <option value="cinquentaPromocao">Promoção 50% antecipada até</option>
     </select>
-
+    <label for="data-pagar">até dia:</label>
+    <input type="date" id="data-pagar" value="2024-12-26">
     <table>
         <thead>
             <tr>
@@ -153,11 +154,32 @@
     </table>
 
     <div id="resultado-final"></div>
+    <div style="display: flex; align-items: center; gap: 10px;">
     <button onclick="copiarTexto('resultado-final')">Copiar resultado</button>
-    <div id="alerta-copiar" style="display: none; position: fixed; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
+    <span id="alerta-copiar" style="display: none; background-color: #4caf50; color: white; padding: 5px 10px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 14px;">
         Texto copiado!
-    </div>
+    </span>
+</div>
+<div id="alerta-calculo" style="display: none; position: fixed; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
+    Calculado!
+</div>
+
     <script>
+
+        document.getElementById('data-entrada').addEventListener('change', function() {
+            const dataEntrada = new Date(this.value);
+            if (!isNaN(dataEntrada)) {
+                // Adiciona um dia à data de entrada
+                dataEntrada.setDate(dataEntrada.getDate() + 1);
+                
+                // Formata para YYYY-MM-DD
+                const proximaData = dataEntrada.toISOString().split('T')[0];
+                
+                // Define a data de saída automaticamente
+                document.getElementById('data-saida').value = proximaData;
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
         atualizarCoresDosValores();
         atualizarCorDescontoPercentual();
@@ -245,7 +267,10 @@
                 "master-valor3",
                 "simples-valor4",
                 "medio-valor4",
-                "master-valor4"
+                "master-valor4",
+                "simples-desc-perc",
+                "medio-desc-perc",
+                "master-desc-perc",
             ];
 
             // Adiciona o evento keydown a cada campo da sequência
@@ -276,6 +301,11 @@ function calcular() {
     const numeroPessoas = parseInt(document.getElementById("numero-pessoas").value) || 1;
     const descontoPercentualsimples = parseInt(document.getElementById("simples-desc-perc").value);
     const adicional = document.getElementById("adicional-info").value.trim() || " ";
+    const datapagar = document.getElementById("data-pagar").value;
+    const datapagarDate = new Date(datapagar + 'T12:00:00'); // Força o meio-dia para evitar ajuste // Força a hora para meia-noite
+    const dia = String(datapagarDate.getDate()).padStart(2, '0');
+    const mes = String(datapagarDate.getMonth() + 1).padStart(2, '0');
+    const dataFormatada = `${dia}/${mes}`;
     const temTaxa = contadorTaxas > 0; // Verifica se as taxas foram aplicadas
     // Captura a opção selecionada
     const opcao = document.getElementById("opcoes").value;
@@ -286,17 +316,31 @@ function calcular() {
             umaDiaria: `Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
         *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
         Com o desconto para pagamento em dinheiro fica:`,
-            cinquenta: `Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia 24/12.
+            cinquenta: `Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
         No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
         Com desconto fica:`,
-            cinquentaPromocao: `Estamos com promoção para o verão! Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia 24/12.
+            cinquentaPromocao: `Estamos com promoção para o verão! Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
         No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
-        Com desconto fica:`
+        Com desconto fica:`,
+        cinquentaPromocao: `Estamos com promoção para o verão! Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
+        No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
+        Com desconto fica:`,
     };
+
     if (!dataEntrada || !dataSaida) {
         alert("Por favor, preencha as datas de entrada e saída.");
         return;
     }
+        // Lógica de cálculo (pode ser implementada aqui)
+        const alerta = document.getElementById('alerta-calculo');
+
+        // Mostrar alerta
+        alerta.style.display = 'block';
+
+        // Ocultar alerta após 1 segundo
+        setTimeout(() => {
+            alerta.style.display = 'none';
+        }, 1000);
 
     // Cabeçalho do orçamento
     let periodo = `Orçamento de período ${dataEntrada.split("-").reverse().join("/")} a ${dataSaida.split("-").reverse().join("/")}, para ${numeroPessoas.toString().padStart(2, '0')} pessoa(s) ${adicional}`;
@@ -326,17 +370,37 @@ function calcular() {
         if (!esgotado) {
             detalhes = detalhes.slice(0, -3); // Remove o último "+"
             totalComDesconto = total - (total * (descontoPercentual / 100));
-            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = R$ ${total.toFixed(2)}\n`;
-            resultadoDescontos += `R$ ${total.toFixed(2)} *-${descontoPercentual}%* = R$ ${totalComDesconto.toFixed(2)}\n`;
+
+            // Formatação de valores
+            const formatarValor = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = ${formatarValor(total)}\n`;
+            resultadoDescontos += `${formatarValor(total)} *-${descontoPercentual}%* = ${formatarValor(totalComDesconto)}\n`;
 
             // Atualiza a tabela
-            document.getElementById(`${categoria}-total`).innerText = `R$ ${total.toFixed(2)}`;
-            document.getElementById(`${categoria}-desc`).innerText = `R$ ${totalComDesconto.toFixed(2)}`;
+            document.getElementById(`${categoria}-total`).innerText = formatarValor(total);
+            document.getElementById(`${categoria}-desc`).innerText = formatarValor(totalComDesconto);
         } else {
             resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
             document.getElementById(`${categoria}-total`).innerText = "Esgotado";
             document.getElementById(`${categoria}-desc`).innerText = "-";
         }
+
+        //versão com dinheiro nao formatado para brl
+        // if (!esgotado) {
+        //     detalhes = detalhes.slice(0, -3); // Remove o último "+"
+        //     totalComDesconto = total - (total * (descontoPercentual / 100));
+        //     resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = R$ ${total.toFixed(2)}\n`;
+        //     resultadoDescontos += `R$ ${total.toFixed(2)} *-${descontoPercentual}%* = R$ ${totalComDesconto.toFixed(2)}\n`;
+
+        //     // Atualiza a tabela
+        //     document.getElementById(`${categoria}-total`).innerText = `R$ ${total.toFixed(2)}`;
+        //     document.getElementById(`${categoria}-desc`).innerText = `R$ ${totalComDesconto.toFixed(2)}`;
+        // } else {
+        //     resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
+        //     document.getElementById(`${categoria}-total`).innerText = "Esgotado";
+        //     document.getElementById(`${categoria}-desc`).innerText = "-";
+        // }
     });
 
     // Insere o texto explicativo da opção selecionada
@@ -345,7 +409,7 @@ function calcular() {
     let taxaServico = temTaxa ? "" : "\*É cobrado mais 10% Taxa Serviço*";
     let check = `\nTambém aceitamos cartão de débito e crédito (Parcelamos em até 12x sem juros com parcela mínima de R$100,00)
     \🛎️O nosso Check-in é a partir das 15:45h e o Check-out até as 12:00h.
-    \*Orçamento válido por dez dias.*`;
+    \*Orçamento válido até prazo prescrito ou por dez dias.*`;
 
     const resultadoCompleto = periodo + resultadoFinal + "\n" + textoExplicativo + "\n" + resultadoDescontos + taxaServico + check;
 
@@ -393,35 +457,6 @@ function atualizarCorContadorTaxas() {
     contadorElem.style.color = contadorTaxas > 0 ? 'green' : 'red';
 }
 
-// function copiarTexto(elementoId) {
-//     const elemento = document.getElementById(elementoId);
-//     const texto = elemento.innerText;
-
-//     if (texto.trim() !== "") {
-//         navigator.clipboard.writeText(texto)
-//             .then(() => alert("Texto copiado!"))
-//             .catch(err => console.error("Erro ao copiar texto: ", err));
-//     } else {
-//         alert("Nada para copiar!");
-//     }
-// }
-//         function copiarTexto(elementoId) {
-//             const elemento = document.getElementById(elementoId);
-//             const texto = elemento.innerText;
-
-//             if (texto.trim() !== "") {
-//                 navigator.clipboard.writeText(texto)
-//                     .then(() => {
-//                         exibirAlerta("Texto copiado!");
-//                     })
-//                     .catch(err => {
-//                         console.error("Erro ao copiar texto: ", err);
-//                     });
-//             } else {
-//                 exibirAlerta("Nada para copiar!");
-//             }
-//         }
-
         function copiarTexto(elementoId) {
             const elemento = document.getElementById(elementoId);
             const texto = elemento.innerText;
@@ -449,6 +484,10 @@ function atualizarCorContadorTaxas() {
                 alerta.style.display = "none";
             }, 1000);
         }
+
+        // function atualizarPagina() {
+        //     location.reload(); // Atualiza a página
+        // }
 
 
     </script>
