@@ -12,6 +12,18 @@
         h2 {
             color: rgb(192, 196, 3); /* Aqui você pode usar o nome da cor, um código hexadecimal (#ff0000), ou RGB */
         }
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Espaçamento entre o título e o input */
+        }
+        #valorInput {
+            width: 60px;
+            text-align: center;
+            color: purple; /* Cor do texto */
+            border: 2px solid purple; /* Borda roxa */
+            border-radius: 5px; /* Cantos arredondados */
+        }
         table {
             border-collapse: collapse;
             width: 100%;
@@ -26,6 +38,9 @@
             width: 60px;
             text-align: center;
             font-size: 14px;
+        }
+        input[type="date"] {
+            width: 100px;  /* Aumenta o comprimento do campo */
         }
         .input-largo {
             width: 300px; /* Ajuste para o tamanho desejado */
@@ -58,11 +73,81 @@
         #meuBotao:active {
             background-color: #a0e6f1; /* Cor mais clara ao clicar */
         }
+        #infoIcon1, #infoIcon2 {
+        cursor: pointer;
+        /* margin-left: 10px; */
+        /* font-size: 1.2rem; */
+        }
+
+        .modal {
+            display: none; /* Inicialmente escondido */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px; /* Limite de largura */
+            max-height: 80vh; /* Limite de altura */
+            overflow-y: auto; /* Adiciona rolagem se necessário */
+        }
+
+        .modal-imagem {
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .fechar {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .fechar:hover {
+            color: black;
+            cursor: pointer;
+        }
+        #atualizarPagina {
+            cursor: pointer;
+        }
 
     </style>
 </head>
 <body>
-    <h2>Orçamento completo</h2>
+    <div class="container">
+        <span id="atualizarPagina" onclick="atualizarPagina()">🔄</span>
+        <h2>Orçamento completo de</h2>
+        <input type="number" id="valorInput" value="15" min="0" max="100" step="5" placeholder="15">%
+        <!-- Ícone e Modal 1 -->
+        <span id="infoIcon1" onclick="abrirModal('modalInfo1')">ℹ️</span>
+        <div id="modalInfo1" class="modal">
+            <div class="modal-content">
+                <span class="fechar" onclick="fecharModal('modalInfo1')">&times;</span>
+                <h3>Descontos</h3>
+                <img src="valores1.png" alt="Depósitos" class="modal-imagem">
+                <!-- <img src="depositos.png" alt="Depósitos" class="modal-imagem"> -->
+                <p>+ verão 1 ou 2 noites de 23/12 até 31/03 de até 24/12  a 10% com taxas</p>
+                <p>+ promo verão 3 noites ou + de 23/12 até 31/03 de até 24/12  a 20% com taxas exceto ano novo, carnaval, pascoa</p>
+                <p>+ promo janeiro 6/1 até 31/1 a 30% com taxas  menos de 25 aptos reservados então seria até alcançar 25 aptos</p>
+                <p>+para verão 2025 10% páscoa 21/04 a 24/04</p>
+            </div>
+        </div>
+    </div>
+    <span id="resultado-dias">total dias: 0</span>
     <div class="form-group">
         <label for="data-entrada">Data de Entrada:</label>
         <input type="date" id="data-entrada">
@@ -89,7 +174,23 @@
         <option value="cinquentaPromocao">Promoção 50% antecipada até</option>
     </select>
     <label for="data-pagar">até dia:</label>
-    <input type="date" id="data-pagar" value="2024-12-26">
+    <input type="date" id="data-pagar">
+    <!-- <span id="infoIcon" onclick="abrirModal()">ℹ️</span> -->
+    <!-- Modal -->
+    <!-- <div id="modalInfo" class="modal">
+        <div class="modal-content">
+            <span class="fechar" onclick="fecharModal()">&times;</span>
+            <img src="depositos.png" alt="Depósitos" class="modal-imagem">
+        </div>
+    </div> -->
+    <!-- Ícone e Modal 2 -->
+    <span id="infoIcon2" onclick="abrirModal('modalInfo2')">ℹ️</span>
+    <div id="modalInfo2" class="modal">
+        <div class="modal-content">
+            <span class="fechar" onclick="fecharModal('modalInfo2')">&times;</span>
+            <img src="depositos.png" alt="Depósitos" class="modal-imagem">
+        </div>
+    </div>
     <table>
         <thead>
             <tr>
@@ -161,10 +262,84 @@
     </span>
 </div>
 <div id="alerta-calculo" style="display: none; position: fixed; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
-    Calculado!
+    <!-- Calculado! -->
 </div>
 
     <script>
+
+        document.getElementById('data-entrada').addEventListener('change', calcularDiass);
+        document.getElementById('data-saida').addEventListener('change', calcularDiass);
+
+        function calcularDiass() {
+            const entrada = document.getElementById('data-entrada').value;
+            const saida = document.getElementById('data-saida').value;
+            const resultado = document.getElementById('resultado-dias');
+
+            if (entrada && saida) {
+                const dataEntrada = new Date(entrada);
+                const dataSaida = new Date(saida);
+
+                const diferencaMs = dataSaida - dataEntrada;
+
+                let dias = diferencaMs / (1000 * 60 * 60 * 24);
+                dias = dias > 0 ? dias : 0;
+
+                resultado.innerHTML = `total dias: ${dias}`;
+            } else {
+                resultado.innerHTML = `total dias: 1`;
+            }
+        }
+
+        const dataEntrada = document.getElementById('data-entrada');
+        const dataSaida = document.getElementById('data-saida');
+
+        const simplesQtd = document.getElementById('simples-qtd1');
+        const medioQtd = document.getElementById('medio-qtd1');
+        const masterQtd = document.getElementById('master-qtd1');
+
+        function calcularDias() {
+            const entrada = new Date(dataEntrada.value);
+            const saida = new Date(dataSaida.value);
+
+            if (!isNaN(entrada) && !isNaN(saida) && entrada < saida) {
+                // Calcula o número de dias entre as datas
+                const diffTime = Math.abs(saida - entrada);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const diasContados = diffDays > 0 ? diffDays : 0;
+
+                // Preenche automaticamente os campos de quantidade
+                simplesQtd.value = diasContados;
+                medioQtd.value = diasContados;
+                masterQtd.value = diasContados;
+            } else {
+                simplesQtd.value = 1;
+                medioQtd.value = 1;
+                masterQtd.value = 1;
+            }
+        }
+
+        // Adiciona eventos para recalcular ao mudar a data
+        dataEntrada.addEventListener('change', calcularDias);
+        dataSaida.addEventListener('change', calcularDias);
+
+        const valorInput = document.getElementById('valorInput');
+                const simplesDesc = document.getElementById('simples-desc-perc');
+                const medioDesc = document.getElementById('medio-desc-perc');
+                const masterDesc = document.getElementById('master-desc-perc');
+
+                // Inicializa os valores com 15
+        simplesDesc.value = 15;
+        medioDesc.value = 15;
+        masterDesc.value = 15;
+
+                // Atualiza os campos ao digitar no input
+                valorInput.addEventListener('input', () => {
+                    const valor = parseFloat(valorInput.value) || 0;
+                    
+                    simplesDesc.value = (valor).toFixed(0);
+                    medioDesc.value = (valor).toFixed(0);
+                    masterDesc.value = (valor).toFixed(0);
+                });
 
         document.getElementById('data-entrada').addEventListener('change', function() {
             const dataEntrada = new Date(this.value);
@@ -334,6 +509,9 @@ function calcular() {
         // Lógica de cálculo (pode ser implementada aqui)
         const alerta = document.getElementById('alerta-calculo');
 
+        // Exibe o alerta com a porcentagem de desconto
+        alerta.innerHTML = `Calculado! ${descontoPercentualsimples}%`;
+
         // Mostrar alerta
         alerta.style.display = 'block';
 
@@ -346,8 +524,13 @@ function calcular() {
     let periodo = `Orçamento de período ${dataEntrada.split("-").reverse().join("/")} a ${dataSaida.split("-").reverse().join("/")}, para ${numeroPessoas.toString().padStart(2, '0')} pessoa(s) ${adicional}`;
     periodo += temTaxa ? ", já com taxas inclusas:\n" : ":\n";
 
-    let resultadoFinal = "Categoria \t TOTAL\n";
-    let resultadoDescontos = "TOTAL \t Total c/ desc.\n";
+    let resultadoFinal = "Categoria \t      Total\n";
+    let resultadoDescontos = "Total \t      Total c/ desc.\n";
+
+     // Função para formatar em reais
+     const formatarReal = (valor) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+    };
 
     categorias.forEach(categoria => {
         let total = 0;
@@ -362,7 +545,7 @@ function calcular() {
 
             if (qtd > 0 && valor > 0) {
                 esgotado = false;
-                detalhes += `${qtd}x${valor.toFixed(2)} + `;
+                detalhes += `${qtd}x${formatarReal(valor)} + `;
                 total += qtd * valor;
             }
         }
@@ -407,7 +590,7 @@ function calcular() {
     const textoExplicativo = textos[opcao] || "";
 
     let taxaServico = temTaxa ? "" : "\*É cobrado mais 10% Taxa Serviço*";
-    let check = `\nTambém aceitamos cartão de débito e crédito (Parcelamos em até 12x sem juros com parcela mínima de R$100,00)
+    let check = `\n Os valores sem desconto poderá ser pago também no cartão de débito e crédito (Parcelamos em até 12x sem juros com parcela mínima de R$100,00)
     \🛎️O nosso Check-in é a partir das 15:45h e o Check-out até as 12:00h.
     \*Orçamento válido até prazo prescrito ou por dez dias.*`;
 
@@ -485,9 +668,45 @@ function atualizarCorContadorTaxas() {
             }, 1000);
         }
 
-        // function atualizarPagina() {
-        //     location.reload(); // Atualiza a página
-        // }
+        // Pega a data atual no formato YYYY-MM-DD
+        const hoje = new Date().toISOString().split('T')[0];
+        // Define a data atual no campo
+        document.getElementById('data-pagar').value = hoje;
+
+        function abrirModal() {
+        document.getElementById("modalInfo").style.display = "block";
+        }
+
+        function fecharModal() {
+            document.getElementById("modalInfo").style.display = "none";
+        }
+
+        // Fechar o modal se clicar fora dele
+        window.onclick = function(event) {
+            const modal = document.getElementById("modalInfo");
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function atualizarPagina() {
+            location.reload(); // Atualiza a página
+        }
+
+        function abrirModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        // Fecha o modal ao clicar fora dele
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
 
 
     </script>

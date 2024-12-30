@@ -46,6 +46,22 @@
             color: #000; /* Ícone preto ao passar o mouse */
             transform: scale(1.2); /* Aumenta um pouco */
         }
+        .input-largo {
+            width: 100%; /* Ocupa toda a largura disponível */
+            max-width: 600px; /* Define um limite máximo */
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box; /* Evita que padding aumente a largura */
+            margin: 10px 0; /* Espaçamento superior e inferior */
+        }
+
+        .input-largo:focus {
+            outline: none;
+            border-color: #007BFF; /* Borda azul ao focar */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Efeito de brilho ao focar */
+        }
         iframe {
             width: 100%;
             height: 700px;
@@ -79,7 +95,15 @@
        <!-- Logo com link -->
        <a href="https://www.lobohotel.com.br/" target="_blank">
         <img src="logo.png" alt="Logo">
-    </a>
+       </a>
+
+            <!-- Campo de texto com classe aplicada -->
+        <input class="input-largo" type="text" placeholder="numero celular, nome, orçamento para..">
+
+            <!-- Ícone que abre o site em nova aba -->
+        <a href="https://lobohotelcalculos13572987.netlify.app/" target="_blank">
+            <i class="fas fa-external-link-alt"></i>
+        </a>
 
         <!-- Ícone no lado direito -->
         <a href="https://rafaellinolobo-portfolio.netlify.app/" target="_blank">
@@ -92,13 +116,13 @@
     <iframe src="completoorca15.html" title="Formulário com 1 valores"></iframe>
 
     <!-- Incluindo o 1 formulário -->
-    <iframe src="calculocompleto10.html" title="Formulário com 1 valores"></iframe>
+    <!-- <iframe src="calculocompleto10.html" title="Formulário com 1 valores"></iframe> -->
 
     <!-- Incluindo o 2 formulário -->
     <iframe src="calculocompleto15.html" title="Formulário com 2 valores"></iframe>
 
     <!-- Incluindo o 3 formulário -->
-    <iframe src="calculocompleto20.html" title="Formulário com 3 valores"></iframe>
+    <!-- <iframe src="calculocompleto20.html" title="Formulário com 3 valores"></iframe> -->
 
     <!-- Incluindo o 3 formulário -->
     <iframe src="valorPorcento.html" title="Formulário com 3 valores"></iframe>

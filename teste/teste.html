@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atualização Automática</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 10px;
+        }
+        input {
+            width: 80px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Descontos</h1>
+        <input type="text" id="valorInput" placeholder="Digite um valor">
+        
+        <table border="1">
+            <tr>
+                <td>Desconto Simples:</td>
+                <td><input type="number" id="simples-desc-perc" value="15" min="0" max="100" step="5">%</td>
+            </tr>
+            <tr>
+                <td>Desconto Médio:</td>
+                <td><input type="number" id="medio-desc-perc" value="15" min="0" max="100" step="5">%</td>
+            </tr>
+            <tr>
+                <td>Desconto Master:</td>
+                <td><input type="number" id="master-desc-perc" value="15" min="0" max="100" step="5">%</td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        const valorInput = document.getElementById('valorInput');
+        const simplesDesc = document.getElementById('simples-desc-perc');
+        const medioDesc = document.getElementById('medio-desc-perc');
+        const masterDesc = document.getElementById('master-desc-perc');
+
+        valorInput.addEventListener('input', () => {
+            const valor = parseFloat(valorInput.value) || 0;
+            
+            simplesDesc.value = (valor).toFixed(0);
+            medioDesc.value = (valor).toFixed(0);
+            masterDesc.value = (valor).toFixed(0);
+        });
+    </script>
+</body>
+</html>

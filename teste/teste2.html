@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Dias</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        .form-group {
+            margin: 20px 0;
+        }
+        input {
+            margin: 10px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Período</h1>
+        
+        <div class="form-group">
+            <label for="data-entrada">Data de Entrada:</label>
+            <input type="date" id="data-entrada">
+            <label for="data-saida">Data de Saída:</label>
+            <input type="date" id="data-saida">
+        </div>
+
+        <div>
+            <label>Simples:</label>
+            <input type="number" id="simples-qtd1" value="1" min="0">x
+            <label>Médio:</label>
+            <input type="number" id="medio-qtd1" value="1" min="0">x
+            <label>Master:</label>
+            <input type="number" id="master-qtd1" value="1" min="0">x
+        </div>
+    </div>
+
+    <script>
+        const dataEntrada = document.getElementById('data-entrada');
+        const dataSaida = document.getElementById('data-saida');
+
+        const simplesQtd = document.getElementById('simples-qtd1');
+        const medioQtd = document.getElementById('medio-qtd1');
+        const masterQtd = document.getElementById('master-qtd1');
+
+        function calcularDias() {
+            const entrada = new Date(dataEntrada.value);
+            const saida = new Date(dataSaida.value);
+
+            if (!isNaN(entrada) && !isNaN(saida) && entrada < saida) {
+                // Calcula o número de dias entre as datas
+                const diffTime = Math.abs(saida - entrada);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const diasContados = diffDays > 0 ? diffDays : 0;
+
+                // Preenche automaticamente os campos de quantidade
+                simplesQtd.value = diasContados;
+                medioQtd.value = diasContados;
+                masterQtd.value = diasContados;
+            } else {
+                simplesQtd.value = 1;
+                medioQtd.value = 1;
+                masterQtd.value = 1;
+            }
+        }
+
+        // Adiciona eventos para recalcular ao mudar a data
+        dataEntrada.addEventListener('change', calcularDias);
+        dataSaida.addEventListener('change', calcularDias);
+    </script>
+</body>
+</html>

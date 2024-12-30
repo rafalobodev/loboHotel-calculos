@@ -12,6 +12,11 @@
         h2 {
             color: rgb(192, 196, 3); /* Aqui você pode usar o nome da cor, um código hexadecimal (#ff0000), ou RGB */
         }
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Espaçamento entre o título e o input */
+        }
         table {
             border-collapse: collapse;
             width: 100%;
@@ -24,6 +29,13 @@
         }
         th {
             background-color: #f4f4f4;
+        }
+        #valorInput {
+            width: 60px;
+            text-align: center;
+            color: purple; /* Cor do texto */
+            border: 2px solid purple; /* Borda roxa */
+            border-radius: 5px; /* Cantos arredondados */
         }
         input {
             width: 60px;
@@ -57,10 +69,18 @@
         #meuBotao:active {
             background-color: #a0e6f1; /* Cor mais clara ao clicar */
         }
+        #atualizarPagina {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <h2>Calculadora de 4 Valores 15%</h2>
+    <!-- <h2>Calculadora de 4 Valores 15%</h2> -->
+    <div class="container">
+        <span id="atualizarPagina" onclick="atualizarPagina()">🔄</span>
+        <h2>calculo completo de</h2>
+        <input type="number" id="valorInput" value="15" min="0" max="100" step="5" placeholder="15">%
+    </div>
 
     <div id="contador-taxas">Taxas aplicadas 0 vezes</div>
     <button type="button" onclick="inverterTaxas()">Remover Taxas</button>
@@ -139,7 +159,30 @@
     <div id="alerta-copiar" style="display: none; position: fixed; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
         Texto copiado!
     </div>
+    <div id="alerta-calculo" style="display: none; position: fixed; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
+        <!-- Calculado! -->
+    </div>
     <script>
+        const valorInput = document.getElementById('valorInput');
+                const simplesDesc = document.getElementById('simples-desc-perc');
+                const medioDesc = document.getElementById('medio-desc-perc');
+                const masterDesc = document.getElementById('master-desc-perc');
+
+                // Inicializa os valores com 15
+        simplesDesc.value = 15;
+        medioDesc.value = 15;
+        masterDesc.value = 15;
+
+        // Atualiza os campos ao digitar no input
+        valorInput.addEventListener('input', () => {
+            const valor = parseFloat(valorInput.value) || 0;
+            
+            simplesDesc.value = (valor).toFixed(0);
+            medioDesc.value = (valor).toFixed(0);
+            masterDesc.value = (valor).toFixed(0);
+        });
+
+
         document.addEventListener('DOMContentLoaded', () => {
         atualizarCoresDosValores();
         atualizarCorDescontoPercentual();
@@ -296,6 +339,28 @@
             let resultadoTotais = "";
             let resultadoDescontos = "";
 
+             // Pega o valor do input de desconto
+            const descontoPercentual = parseFloat(document.getElementById('valorInput').value) || 0;
+
+            // Lógica de cálculo (pode ser implementada aqui)
+            const alerta = document.getElementById('alerta-calculo');
+
+            // Exibe o alerta com a porcentagem de desconto
+            alerta.innerHTML = `Calculado! ${descontoPercentual}%`;
+
+            // Mostrar alerta
+            alerta.style.display = 'block';
+
+            // Ocultar alerta após 1 segundo
+            setTimeout(() => {
+                alerta.style.display = 'none';
+            }, 1000);
+
+            // Função para formatar em reais
+            const formatarReal = (valor) => {
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+            };
+
             categorias.forEach(categoria => {
                 let total = 0;
                 let totalComDesconto = 0;
@@ -309,36 +374,32 @@
 
                     if (qtd > 0 && valor > 0) { // Apenas considera valores válidos
                         esgotado = false; // Se houver valores válidos, não está esgotado
-                        detalhes += `${qtd}x${valor.toFixed(2)} + `;
+                        detalhes += `${qtd}x${formatarReal(valor)} + `;
                         total += qtd * valor;
                     }
                 }
 
                 if (esgotado) {
-                    // Caso todos os valores sejam zero
                     resultadoTotais += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
                     document.getElementById(`${categoria}-total`).innerText = "Esgotado";
                     document.getElementById(`${categoria}-desc`).innerText = "-";
                 } else {
-                    // Se houver detalhes válidos
                     detalhes = detalhes.slice(0, -3); // Remove o último "+"
                     totalComDesconto = total - (total * (descontoPercentual / 100));
 
-                    // Adiciona o total por categoria
-                    resultadoTotais += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = R$ ${total.toFixed(2)}\n`;
-                    // Adiciona o cálculo com desconto
-                    resultadoDescontos += `R$ ${total.toFixed(2)} *-${descontoPercentual}%* = R$ ${totalComDesconto.toFixed(2)}\n`;
+                    resultadoTotais += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = ${formatarReal(total)}\n`;
+                    resultadoDescontos += `${formatarReal(total)} *-${descontoPercentual}%* = ${formatarReal(totalComDesconto)}\n`;
 
                     // Atualiza os campos na tabela
-                    document.getElementById(`${categoria}-total`).innerText = `R$ ${total.toFixed(2)}`;
-                    document.getElementById(`${categoria}-desc`).innerText = `R$ ${totalComDesconto.toFixed(2)}`;
+                    document.getElementById(`${categoria}-total`).innerText = formatarReal(total);
+                    document.getElementById(`${categoria}-desc`).innerText = formatarReal(totalComDesconto);
                 }
             });
 
-            // Exibe os resultados no formato desejado
             document.getElementById("resultado-final").innerText = resultadoTotais || "Nenhuma categoria válida.";
             document.getElementById("resultado-descontos").innerText = resultadoDescontos || "Nenhum desconto aplicável.";
         }
+
 
         function copiarTexto(elementoId) {
             const elemento = document.getElementById(elementoId);
@@ -368,6 +429,9 @@
             }, 1000);
         }
 
+        function atualizarPagina() {
+            location.reload(); // Atualiza a página
+        }
 
     </script>
 </body>

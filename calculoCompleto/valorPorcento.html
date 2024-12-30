@@ -15,6 +15,11 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Espaçamento entre o título e o input */
+        }
         label {
             display: block;
             margin-bottom: 5px;
@@ -46,10 +51,16 @@
             border: 1px solid #ced4da;
             border-radius: 4px;
         }
+        #atualizarPagina {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <h1>Calculadora de Taxa</h1>
+    <div class="container">
+        <span id="atualizarPagina" onclick="atualizarPagina()">🔄</span>
+        <h1>Calculadora de Taxa</h1>
+    </div>
     <form id="taxCalculator">
         <label for="initialValue">Valor:</label>
         <input type="number" id="initialValue" placeholder="Digite o valor inicial" required>
@@ -62,11 +73,19 @@
 
     <div id="result" class="result" style="display: none;">
         <p><strong>Porcentagem de Taxa:</strong> <span id="percentage"></span>%</p>
-        <p><strong>Quanto de Taxa:</strong> R$ <span id="difference"></span></p>
+        <p><strong>Quanto de Taxa:</strong> <span id="difference"></span></p>
     </div>
 
     <script>
-         document.addEventListener('DOMContentLoaded', () => {
+        // Função para formatar valores em reais
+        function formatarReal(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valor);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
             // Campos a serem navegados
             const fields = ['initialValue', 'finalValue'];
 
@@ -88,7 +107,7 @@
                 }
             });
         });
-        
+
         function calculate() {
             const initialValue = parseFloat(document.getElementById('initialValue').value);
             const finalValue = parseFloat(document.getElementById('finalValue').value);
@@ -102,8 +121,12 @@
             const percentage = ((difference / initialValue) * 100).toFixed(2);
 
             document.getElementById('percentage').textContent = percentage;
-            document.getElementById('difference').textContent = difference.toFixed(2);
+            document.getElementById('difference').textContent = formatarReal(difference);
             document.getElementById('result').style.display = 'block';
+        }
+
+        function atualizarPagina() {
+            location.reload(); // Atualiza a página
         }
     </script>
 </body>
