@@ -130,7 +130,7 @@
 <body>
     <div class="container">
         <span id="atualizarPagina" onclick="atualizarPagina()">🔄</span>
-        <h2>Orçamento completo de</h2>
+        <h2>Orçamento espanhol de</h2>
         <input type="number" id="valorInput" value="15" min="0" max="100" step="5" placeholder="15">%
         <!-- Ícone e Modal 1 -->
         <span id="infoIcon1" onclick="abrirModal('modalInfo1')">ℹ️</span>
@@ -486,17 +486,17 @@ function calcular() {
     const opcao = document.getElementById("opcoes").value;
     // Textos pré-definidos para cada opção
     const textos = {
-            hoje: `O restante no check-in em dinheiro ou pix ganha ${descontoPercentualsimples}% de desconto.
-        Com o desconto para pagamento em dinheiro fica:`,
-            umaDiaria: `Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
-        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
-        Com o desconto para pagamento em dinheiro fica:`,
-            cinquenta: `Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
-        No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
-        Com desconto fica:`,
-            cinquentaPromocao: `Estamos com promoção para o verão! Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
-        No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
-        Com desconto fica:`,
+            hoje: `El resto en el check-in en efectivo o mediante PIX tiene un descuento del ${descontoPercentualsimples}% 
+            Con el descuento por pago en efectivo queda:`,
+            umaDiaria: `Solicitamos el pago de *una noche* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
+        *El resto, si se paga en efectivo durante el check-in, tiene un descuento del ${descontoPercentualsimples}%*.
+        Con el descuento por pago en efectivo queda:`,
+            cinquenta: `Ofrecemos un ${descontoPercentualsimples}% de descuento mediante el pago del 50% del valor total de la estancia hasta el día ${dataFormatada}.
+        El descuento se aplica el día del check-in para pagos vía PIX o en efectivo.
+        Con el descuento queda:`,
+            cinquentaPromocao: `Estamos en promoción para el verano! Ofrecemos ${descontoPercentualsimples}% de descuento mediante el pago del 50% del valor total de la estancia hasta el día ${dataFormatada}.
+        El descuento se aplica el día del check-in para pagos vía PIX o en efectivo.
+        Con el descuento queda:`,
     };
 
     if (!dataEntrada || !dataSaida) {
@@ -518,10 +518,10 @@ function calcular() {
         }, 1000);
 
     // Cabeçalho do orçamento
-    let periodo = `Orçamento de período ${dataEntrada.split("-").reverse().join("/")} a ${dataSaida.split("-").reverse().join("/")}, para ${numeroPessoas.toString().padStart(2, '0')} pessoa(s) ${adicional}`;
-    periodo += temTaxa ? ", já com taxas inclusas:\n" : ":\n";
+    let periodo = `Presupuesto del ${dataEntrada.split("-").reverse().join("/")} al ${dataSaida.split("-").reverse().join("/")}, para ${numeroPessoas.toString().padStart(2, '0')} persona(s) ${adicional}`;
+    periodo += temTaxa ? ", con tasas ya incluidos:\n" : ":\n";
 
-    let resultadoFinal = "Categoria \t      Total\n";
+    let resultadoFinal = "Categoría \t      Total\n";
     let resultadoDescontos = "Total \t      Total c/ desc.\n";
 
      // Função para formatar em reais
@@ -586,10 +586,10 @@ function calcular() {
     // Insere o texto explicativo da opção selecionada
     const textoExplicativo = textos[opcao] || "";
 
-    let taxaServico = temTaxa ? "" : "\*É cobrado mais 10% Taxa Serviço*";
-    let check = `\n Os valores sem desconto poderá ser pago também no cartão de débito e crédito (Parcelamos em até 12x sem juros com parcela mínima de R$100,00)
-    \🛎️O nosso Check-in é a partir das 15:45h e o Check-out até as 12:00h.
-    \*Orçamento válido até prazo prescrito ou por dez dias.*`;
+    let taxaServico = temTaxa ? "" : "\*Se cobra un 10% adicional como Tasa de Servicio.*";
+    let check = `\n También se pueden pagar los importes sin descuento tarjeta de débito y crédito (hasta 12 cuotas sin interés con una cuota mínima de R$100,00)
+    \🛎️ El check-in es a partir de las 15:45h y el check-out hasta las 12:00h.
+    \*Cotización válida hasta el plazo prescrito o por diez días.*`;
 
     const resultadoCompleto = periodo + resultadoFinal + "\n" + textoExplicativo + "\n" + resultadoDescontos + taxaServico + check;
 
