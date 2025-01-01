@@ -140,8 +140,8 @@
                 <h3>Descontos</h3>
                 <img src="valores1.png" alt="Depósitos" class="modal-imagem">
                 <!-- <img src="depositos.png" alt="Depósitos" class="modal-imagem"> -->
-                <p>+ verão 1 ou 2 noites de 23/12 até 31/03 de até 24/12  a 10% com taxas</p>
-                <p>+ promo verão 3 noites ou + de 23/12 até 31/03 de até 24/12  a 20% com taxas exceto ano novo, carnaval, pascoa</p>
+                <p>+ verão 1 ou 2 ou 3 noites de 23/12 até 31/03 de até 24/12  a 10% com taxas</p>
+                <p>+ promo verão 4 noites ou + de 23/12 até 31/03 de até 24/12  a 20% com taxas exceto ano novo, carnaval, pascoa</p>
                 <p>+ promo janeiro 6/1 até 31/1 a 30% com taxas  menos de 25 aptos reservados então seria até alcançar 25 aptos</p>
                 <p>+para verão 2025 10% páscoa 21/04 a 24/04</p>
             </div>
@@ -188,6 +188,7 @@
     <div id="modalInfo2" class="modal">
         <div class="modal-content">
             <span class="fechar" onclick="fecharModal('modalInfo2')">&times;</span>
+            <h3>Antecipada até</h3>
             <img src="depositos.png" alt="Depósitos" class="modal-imagem">
         </div>
     </div>
@@ -267,8 +268,24 @@
 
     <script>
 
-        document.getElementById('data-entrada').addEventListener('change', calcularDiass);
+        document.getElementById('data-entrada').addEventListener('change', atualizarDataSaida);
         document.getElementById('data-saida').addEventListener('change', calcularDiass);
+
+        function atualizarDataSaida() {
+            const entrada = document.getElementById('data-entrada').value;
+            const saida = document.getElementById('data-saida');
+            
+            if (entrada) {
+                const dataEntrada = new Date(entrada);
+                const dataSaida = new Date(dataEntrada);
+                dataSaida.setDate(dataEntrada.getDate() + 1);  // Saída sempre 1 dia após entrada
+
+                // Formatar a data para YYYY-MM-DD (formato aceito pelo input date)
+                const dataFormatada = dataSaida.toISOString().split('T')[0];
+                saida.value = dataFormatada;
+            }
+            calcularDiass();
+        }
 
         function calcularDiass() {
             const entrada = document.getElementById('data-entrada').value;
@@ -279,16 +296,24 @@
                 const dataEntrada = new Date(entrada);
                 const dataSaida = new Date(saida);
 
+                // Se a data de saída for anterior à entrada, mostra 0 dias
+                if (dataSaida < dataEntrada) {
+                    resultado.innerHTML = `Total dias: 0`;
+                    return;
+                }
+                
                 const diferencaMs = dataSaida - dataEntrada;
-
                 let dias = diferencaMs / (1000 * 60 * 60 * 24);
-                dias = dias > 0 ? dias : 0;
 
-                resultado.innerHTML = `total dias: ${dias}`;
+                // Garante que pelo menos 1 dia será exibido
+                dias = dias >= 1 ? dias : 1;
+
+                resultado.innerHTML = `Total dias: ${dias}`;
             } else {
-                resultado.innerHTML = `total dias: 1`;
+                resultado.innerHTML = `Total dias: 1`;
             }
         }
+
 
         const dataEntrada = document.getElementById('data-entrada');
         const dataSaida = document.getElementById('data-saida');
