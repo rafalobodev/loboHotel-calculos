@@ -125,6 +125,27 @@
             cursor: pointer;
         }
 
+        #sugestoes {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            background-color: white;
+            max-height: 150px;
+            overflow-y: auto;
+            opacity: 0.8;
+        }
+        #sugestoes li {
+            padding: 10px;
+            cursor: pointer;
+        }
+        #sugestoes li:hover {
+            background-color: #f0f0f0;
+        }
+
     </style>
 </head>
 <body>
@@ -156,7 +177,7 @@
         <label for="numero-pessoas">Número de Pessoas:</label>
         <input type="number" id="numero-pessoas" value="1" min="1">
         <label for="adicional-info">Adicional:</label>
-        <input type="text" id="adicional-info" class="input-largo" placeholder="Ex: free, casal, camas separadas">
+        <input list="opcoes-adicional" type="text" id="adicional-info" class="input-largo" placeholder="Ex: free, casal, camas separadas">
     </div>
 
     <div id="contador-taxas">Taxas aplicadas 0 vezes</div>
@@ -175,14 +196,6 @@
     </select>
     <label for="data-pagar">até dia:</label>
     <input type="date" id="data-pagar">
-    <!-- <span id="infoIcon" onclick="abrirModal()">ℹ️</span> -->
-    <!-- Modal -->
-    <!-- <div id="modalInfo" class="modal">
-        <div class="modal-content">
-            <span class="fechar" onclick="fecharModal()">&times;</span>
-            <img src="depositos.png" alt="Depósitos" class="modal-imagem">
-        </div>
-    </div> -->
     <!-- Ícone e Modal 2 -->
     <span id="infoIcon2" onclick="abrirModal('modalInfo2')">ℹ️</span>
     <div id="modalInfo2" class="modal">
@@ -267,7 +280,43 @@
 </div>
 
     <script>
+        /*++++++++++++++++++opçoes do adicional+++++++++++++++++++++++++++++*/
+        const input = document.getElementById('adicional-info');
+        const opcoes = ["casal", "camas separadas", "+ criança free", "+ bebê free"];
 
+        input.addEventListener('focus', () => {
+            let lista = document.createElement('ul');
+            lista.id = "sugestoes";
+            lista.style.position = "absolute";
+            lista.style.zIndex = "1000";
+            lista.style.border = "1px solid #ccc";
+            lista.style.width = input.offsetWidth + "px";
+
+            opcoes.forEach(opcao => {
+                let item = document.createElement('li');
+                item.textContent = opcao;
+                item.style.padding = "5px";
+                item.style.cursor = "pointer";
+
+                item.addEventListener('click', () => {
+                    input.value = opcao;
+                    lista.remove();
+                });
+
+                lista.appendChild(item);
+            });
+
+            document.body.appendChild(lista);
+
+            let rect = input.getBoundingClientRect();
+            lista.style.top = rect.bottom + "px";
+            lista.style.left = rect.left + "px";
+
+            input.addEventListener('blur', () => {
+                setTimeout(() => lista.remove(), 100);
+            });
+        });
+        /*++++++++++++++++++campos do podo de dias mudaremde acordo com entrada e saida+++++++++++++++++++++++++++++*/
         document.getElementById('data-entrada').addEventListener('change', atualizarDataSaida);
         document.getElementById('data-saida').addEventListener('change', calcularDiass);
 
@@ -296,12 +345,6 @@
                 const dataEntrada = new Date(entrada);
                 const dataSaida = new Date(saida);
 
-                // Se a data de saída for anterior à entrada, mostra 0 dias
-                if (dataSaida < dataEntrada) {
-                    resultado.innerHTML = `Total dias: 0`;
-                    return;
-                }
-                
                 const diferencaMs = dataSaida - dataEntrada;
                 let dias = diferencaMs / (1000 * 60 * 60 * 24);
 
@@ -314,7 +357,7 @@
             }
         }
 
-
+        /*++++++++++++++++++campos mudarem os dias de acordo com entrade e saida+++++++++++++++++++++++++++++*/
         const dataEntrada = document.getElementById('data-entrada');
         const dataSaida = document.getElementById('data-saida');
 
@@ -515,7 +558,7 @@ function calcular() {
         Com o desconto para pagamento em dinheiro fica:`,
             umaDiaria: `Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
         *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
-        Com o desconto para pagamento em dinheiro fica:`,
+        Com o desconto para pagamento em dinheiro ou pix fica:`,
             cinquenta: `Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
         No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
         Com desconto fica:`,
