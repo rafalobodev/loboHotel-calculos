@@ -101,6 +101,12 @@
             max-height: 80vh; /* Limite de altura */
             overflow-y: auto; /* Adiciona rolagem se necessário */
         }
+        .zoomed {
+            transform: scale(1.4); /* Amplia a imagem em 2x */
+            cursor: zoom-out; /* Mostra o cursor de redução */
+            margin-left: 50%; /* Centraliza horizontalmente */
+            transform-origin: left; /* Define o ponto de origem do zoom como o centro */
+        }
 
         .modal-imagem {
             display: block;
@@ -108,8 +114,9 @@
             width: 100%;
             height: auto;
             border-radius: 8px;
+            transition: transform 0.3s ease; /* Transição suave */
+            cursor: zoom-in;
         }
-
         .fechar {
             color: #aaa;
             float: right;
@@ -161,10 +168,11 @@
                 <h3>Descontos</h3>
                 <img src="valores1.png" alt="Depósitos" class="modal-imagem">
                 <!-- <img src="depositos.png" alt="Depósitos" class="modal-imagem"> -->
-                <p>+ verão 1 ou 2 ou 3 noites de 23/12 até 31/03 de até 24/12  a 10% com taxas</p>
-                <p>+ promo verão 4 noites ou + de 23/12 até 31/03 de até 24/12  a 20% com taxas exceto ano novo, carnaval, pascoa</p>
-                <p>+ promo janeiro 6/1 até 31/1 a 30% com taxas  menos de 25 aptos reservados então seria até alcançar 25 aptos</p>
-                <p>+para verão 2025 10% páscoa 21/04 a 24/04</p>
+                <p>*janeiro e fevereiro finds é <span style="color: red;">mínimo aceito de 02 noites</span></p>
+                <p>*promo janeiro 6/1 até 31/1 a <b style="color: purple;">30%</b> menos de 25 aptos reservados então seria até alcançar 25 aptos</p>
+                <p>*verão 1 ou 2 ou 3 noites de 01/03 até 31/03 de até 24/12  a <b style="color: purple;">10%</b></p>
+                <p>*promo verão 4 noites ou + de 01/03 até 31/03 de até 24/12  a <b style="color: purple;">20%</b> <span style="color: red;">exceto ano novo, carnaval, pascoa</span></p>
+                <p>*para verão 2025 <b style="color: purple;">10%</b> páscoa</p>
             </div>
         </div>
     </div>
@@ -178,6 +186,16 @@
         <input type="number" id="numero-pessoas" value="1" min="1">
         <label for="adicional-info">Adicional:</label>
         <input list="opcoes-adicional" type="text" id="adicional-info" class="input-largo" placeholder="Ex: free, casal, camas separadas">
+        <!-- Ícone e Modal 3 -->
+        <span id="infoIcon2" onclick="abrirModal('modalInfo3')">ℹ️</span>
+        <div id="modalInfo3" class="modal">
+            <div class="modal-contenttres">
+                <span class="fechar" onclick="fecharModal('modalInfo3')">&times;</span>
+                <h3>Quartos</h3>
+                <img src="quartos.jpg" alt="Depósitos" class="modal-imagem" onclick="toggleZoom(this)">
+            </div>
+        </div>
+    </div>
     </div>
 
     <div id="contador-taxas">Taxas aplicadas 0 vezes</div>
@@ -280,6 +298,9 @@
 </div>
 
     <script>
+        function toggleZoom(element) {
+            element.classList.toggle('zoomed'); // Adiciona ou remove a classe 'zoomed' para ampliar/reduzir
+        }
         /*++++++++++++++++++opçoes do adicional+++++++++++++++++++++++++++++*/
         const input = document.getElementById('adicional-info');
         const opcoes = ["casal", "camas separadas", "+ criança free", "+ bebê free"];
