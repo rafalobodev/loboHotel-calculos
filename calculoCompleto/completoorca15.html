@@ -212,6 +212,8 @@
         <option value="umaDiaria">*uma diária* antecipada</option>
         <option value="cinquenta">50% total antecipada até</option>
         <option value="cinquentaPromocao">Promo verão 50% antecipada até</option>
+        <option value="duasDiarias">*duas diárias* antecipada</option>
+        <option value="tresDiarias">*três diárias* antecipada</option>
     </select>
     <label for="data-pagar">até dia:</label>
     <input type="date" id="data-pagar">
@@ -588,6 +590,12 @@ function calcular() {
             cinquentaPromocao: `Estamos com promoção para o verão! Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
         No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
         Com desconto fica:`,
+            duasDiarias: `Solicitamos o pagamento de *duas diárias* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pagamento em dinheiro ou pix fica:`,
+            tresDiarias: `Solicitamos o pagamento de *tres diárias* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pagamento em dinheiro ou pix fica:`,
     };
 
     if (!dataEntrada || !dataSaida) {
