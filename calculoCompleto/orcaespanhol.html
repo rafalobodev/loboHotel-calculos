@@ -677,7 +677,7 @@ function calcular() {
             document.getElementById(`${categoria}-total`).innerText = formatarValor(total);
             document.getElementById(`${categoria}-desc`).innerText = formatarValor(totalComDesconto);
         } else {
-            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: agotado\n`;
             document.getElementById(`${categoria}-total`).innerText = "Esgotado";
             document.getElementById(`${categoria}-desc`).innerText = "-";
         }

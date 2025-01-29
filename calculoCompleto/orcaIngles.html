@@ -308,7 +308,7 @@
         }
         /*++++++++++++++++++opçoes do adicional+++++++++++++++++++++++++++++*/
         const input = document.getElementById('adicional-info');
-        const opcoes = ["casal", "camas separadas", "+ criança free", "+ bebê free"];
+        const opcoes = ["couple", "separate beds", "+ free child", "+ free baby"];
 
         input.addEventListener('focus', () => {
             let lista = document.createElement('ul');
@@ -661,7 +661,7 @@ function calcular() {
             document.getElementById(`${categoria}-total`).innerText = formatarValor(total);
             document.getElementById(`${categoria}-desc`).innerText = formatarValor(totalComDesconto);
         } else {
-            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: fully booked\n`;
             document.getElementById(`${categoria}-total`).innerText = "Esgotado";
             document.getElementById(`${categoria}-desc`).innerText = "-";
         }
@@ -688,8 +688,8 @@ function calcular() {
 
     let taxaServico = temTaxa ? "" : "\*An additional 10% Service Fee will be charged*";
     let check = `\n The amounts without discount can also be paid by debit or credit card (we accept installments of up to 12x without interest with a minimum installment of R$100.00)
-    \🛎️Our check-in is from 3:45 pm and check-out is until 12:00 pm.
-    \*Orçamento válido até prazo prescrito ou por dez dias.*`;
+    \🛎️Our check-in is from 15:45 pm and check-out is until 12:00 pm.
+    \*Quote valid until the prescribed period or for ten days.*`;
 
     const resultadoCompleto = periodo + resultadoFinal + "\n" + textoExplicativo + "\n" + resultadoDescontos + taxaServico + check;
 
