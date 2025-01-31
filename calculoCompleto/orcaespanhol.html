@@ -160,7 +160,7 @@
 <body>
     <div class="container">
         <span id="atualizarPagina" onclick="atualizarPagina()">🔄</span>
-        <h2>Orçamento espanhol de</h2>
+        <h2>Orçamento Espanhol de</h2>
         <input type="number" id="valorInput" value="15" min="0" max="100" step="5" placeholder="15">%
         <!-- Ícone e Modal 1 -->
         <span id="infoIcon1" onclick="abrirModal('modalInfo1')">💲</span>
@@ -638,7 +638,8 @@ function calcular() {
     periodo += temTaxa ? ", con tasas ya incluidos:\n" : ":\n";
 
     let resultadoFinal = "Categoría \t      Total\n";
-    let resultadoDescontos = "Total \t      Total c/ desc.\n";
+    let resultadoDescontos = ""; //let resultadoDescontos = "Total \t      Total c/ desc.\n";
+    let temDesconto = false; // Variável para verificar se há desconto acima de 0%
 
      // Função para formatar em reais
      const formatarReal = (valor) => {
@@ -671,13 +672,20 @@ function calcular() {
             const formatarValor = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
             resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = ${formatarValor(total)}\n`;
-            resultadoDescontos += `${formatarValor(total)} *-${descontoPercentual}%* = ${formatarValor(totalComDesconto)}\n`;
 
-            // Atualiza a tabela
+            // Só adiciona desconto se o percentual for maior que 0
+            if (descontoPercentual > 0) {
+                temDesconto = true; // Marca que há pelo menos um desconto
+                resultadoDescontos += `${formatarValor(total)} *-${descontoPercentual}%* = ${formatarValor(totalComDesconto)}\n`;
+                document.getElementById(`${categoria}-desc`).innerText = formatarValor(totalComDesconto);
+            } else {
+                document.getElementById(`${categoria}-desc`).innerText = "-"; // Ou pode ocultar essa linha se preferir
+            }
+
+            // Atualiza a tabela com o total original
             document.getElementById(`${categoria}-total`).innerText = formatarValor(total);
-            document.getElementById(`${categoria}-desc`).innerText = formatarValor(totalComDesconto);
         } else {
-            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: agotado\n`;
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Agotado\n`;
             document.getElementById(`${categoria}-total`).innerText = "Esgotado";
             document.getElementById(`${categoria}-desc`).innerText = "-";
         }
@@ -698,6 +706,11 @@ function calcular() {
         //     document.getElementById(`${categoria}-desc`).innerText = "-";
         // }
     });
+
+    // Se houver descontos, adiciona cabeçalho
+    if (temDesconto) {
+        resultadoDescontos = "Total \t      Total c/ desc.\n" + resultadoDescontos;
+    }
 
     // Insere o texto explicativo da opção selecionada
     const textoExplicativo = textos[opcao] || "";
