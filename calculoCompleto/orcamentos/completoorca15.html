@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Descontos e Taxas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            color: rgb(192, 196, 3); /* Aqui você pode usar o nome da cor, um código hexadecimal (#ff0000), ou RGB */
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Espaçamento entre o título e o input */
+        }
+        #valorInput {
+            width: 60px;
+            text-align: center;
+            color: purple; /* Cor do texto */
+            border: 2px solid purple; /* Borda roxa */
+            border-radius: 5px; /* Cantos arredondados */
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid black;
+            text-align: center;
+            padding: 5px;
+        }
+        input {
+            width: 60px;
+            text-align: center;
+            font-size: 14px;
+        }
+        input[type="date"] {
+            width: 100px;  /* Aumenta o comprimento do campo */
+        }
+        .input-largo {
+            width: 300px; /* Ajuste para o tamanho desejado */
+            font-size: 14px;
+        }
+        .resultado {
+            background-color: #fdf4c7;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        #resultado-final, #resultado-descontos {
+            margin-top: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            font-size: 14px;
+            border: 1px solid black;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        #meuBotao {
+            background-color: rgb(110, 207, 227); /* Cor de fundo */
+        }
+
+        #meuBotao:hover {
+            background-color: #06ccda; /* Mudança de cor ao passar o mouse */
+        }
+        #meuBotao:active {
+            background-color: #a0e6f1; /* Cor mais clara ao clicar */
+        }
+        #infoIcon1, #infoIcon2 {
+        cursor: pointer;
+        /* margin-left: 10px; */
+        /* font-size: 1.2rem; */
+        }
+
+        .modal {
+            display: none; /* Inicialmente escondido */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px; /* Limite de largura */
+            max-height: 80vh; /* Limite de altura */
+            overflow-y: auto; /* Adiciona rolagem se necessário */
+        }
+        .zoomed {
+            transform: scale(1.4); /* Amplia a imagem em 2x */
+            cursor: zoom-out; /* Mostra o cursor de redução */
+            margin-left: 50%; /* Centraliza horizontalmente */
+            transform-origin: left; /* Define o ponto de origem do zoom como o centro */
+        }
+
+        .modal-imagem {
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            transition: transform 0.3s ease; /* Transição suave */
+            cursor: zoom-in;
+        }
+        .fechar {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .fechar:hover {
+            color: black;
+            cursor: pointer;
+        }
+        #atualizarPagina {
+            cursor: pointer;
+        }
+
+        #sugestoes {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            background-color: white;
+            max-height: 150px;
+            overflow-y: auto;
+            opacity: 0.8;
+        }
+        #sugestoes li {
+            padding: 10px;
+            cursor: pointer;
+        }
+        #sugestoes li:hover {
+            background-color: #f0f0f0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span id="atualizarPagina" onclick="atualizarPagina()">🔄</span>
+        <h2>Orçamento Brasil de</h2>
+        <input type="number" id="valorInput" value="15" min="0" max="100" step="5" placeholder="15">%
+        <!-- Ícone e Modal 1 -->
+        <span id="infoIcon1" onclick="abrirModal('modalInfo1')">💲</span>
+        <div id="modalInfo1" class="modal">
+            <div class="modal-content">
+                <span class="fechar" onclick="fecharModal('modalInfo1')">&times;</span>
+                <h3>Descontos</h3>
+                <img src="../img/valores1.png" alt="png" class="modal-imagem">
+                <img src="../img/valores1.jpg" alt="jpg" class="modal-imagem">
+                <p>*janeiro e fevereiro finds é <span style="color: red;">mínimo aceito de 02 noites</span></p>
+                <p>*promo janeiro 13/1 até 31/1 a <b style="color: purple;">30%</b> menos de 25 aptos reservados então seria até alcançar 25 aptos</p>
+                <p>*verão 1 ou 2 ou 3 noites de 01/03 até 31/03 <b style="color: purple;">10%</b></p>
+                <p>*promo verão 4 noites ou + de 01/03 até 31/03 <b style="color: purple;">20%</b> <span style="color: red;">exceto carnaval, pascoa</span></p>
+                <!-- <p>*<b style="color: purple;">20%</b> carnaval 2025</p> -->
+                <p>*para verão 2025 <b style="color: purple;">10%</b> páscoa</p>
+            </div>
+        </div>
+    </div>
+    <span id="resultado-dias">total dias: 0</span>
+    <div class="form-group">
+        <label for="data-entrada">Data de Entrada:</label>
+        <input type="date" id="data-entrada">
+        <label for="data-saida">Data de Saída:</label>
+        <input type="date" id="data-saida">
+        <label for="numero-pessoas">Número de Pessoas:</label>
+        <input type="number" id="numero-pessoas" value="1" min="1">
+        <label for="adicional-info">Adicional:</label>
+        <input list="opcoes-adicional" type="text" id="adicional-info" class="input-largo" placeholder="Ex: free, casal, camas separadas">
+        <!-- Ícone e Modal 3 -->
+        <span id="infoIcon2" onclick="abrirModal('modalInfo3')">🚪</span>
+        <div id="modalInfo3" class="modal">
+            <div class="modal-contenttres">
+                <span class="fechar" onclick="fecharModal('modalInfo3')">&times;</span>
+                <h3>Quartos</h3>
+                <img src="../img/quartos.jpg" alt="Depósitos" class="modal-imagem" onclick="toggleZoom(this)">
+                <p>*quarto 41 master tem vista pro mar muito pequena para considerar</p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div id="contador-taxas">Taxas aplicadas 0 vezes</div>
+    <button type="button" onclick="inverterTaxas()">Remover Taxas</button>
+    <label for="taxa">Taxas (%):</label>
+    <input type="number" id="taxa" value="10" min="0" max="100" step="1">
+    <button type="button" onclick="aplicarTaxas()">Aplicar Taxas</button>
+    <button id="meuBotao" type="button" onclick="calcular()">Calcular Totais</button>
+    <!-- Campo de Seleção -->
+    <label for="opcoes">Tipo orçamento:</label>
+    <select id="opcoes">
+        <option value="hoje">Hoje</option>
+        <option value="umaDiaria">*uma diária* antecipada</option>
+        <option value="cinquenta">50% total antecipada até</option>
+        <option value="cinquentaPromocao">Promo verão 50% antecipada até</option>
+        <option value="duasDiarias">*duas diárias* antecipada</option>
+        <option value="tresDiarias">*três diárias* antecipada</option>
+        <option value="hojesem">Hoje sem desc.</option>
+        <option value="cinquentasem">50% total sem desc. até</option>
+        <option value="umaDiariasem">*uma diária* sem desc.</option>
+        <option value="duasDiariassem">*duas diárias* sem desc.</option>
+        <option value="tresDiariassem">*três diárias* sem desc.</option>
+    </select>
+    <label for="data-pagar">até dia:</label>
+    <input type="date" id="data-pagar">
+    <!-- Ícone e Modal 2 -->
+    <span id="infoIcon2" onclick="abrirModal('modalInfo2')">⏳</span>
+    <div id="modalInfo2" class="modal">
+        <div class="modal-content">
+            <span class="fechar" onclick="fecharModal('modalInfo2')">&times;</span>
+            <h3>Antecipada até</h3>
+            <img src="../img/depositos.png" alt="Depósitos" class="modal-imagem">
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Categoria</th>
+                <th>Dias 1</th>
+                <th>Valor 1</th>
+                <th>Dias 2</th>
+                <th>Valor 2</th>
+                <th>Dias 3</th>
+                <th>Valor 3</th>
+                <th>Dias 4</th>
+                <th>Valor 4</th>
+                <th>Total</th>
+                <th>Desconto (%)</th>
+                <th>Com Desconto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Simples</td>
+                <td><input type="number" id="simples-qtd1" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="simples-qtd2" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor2" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="simples-qtd3" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor3" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="simples-qtd4" value="1" min="0">x</td>
+                <td>$<input type="number" id="simples-valor4" value="0" min="0" step="0.01"></td>
+                <td class="resultado" id="simples-total">R$ 0,00</td>
+                <td><input type="number" id="simples-desc-perc" value="15" min="0" max="100" step="5">%</td>
+                <td class="resultado" id="simples-desc">R$ 0,00</td>
+            </tr>
+            <tr>
+                <td>Médio</td>
+                <td><input type="number" id="medio-qtd1" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="medio-qtd2" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor2" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="medio-qtd3" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor3" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="medio-qtd4" value="1" min="0">x</td>
+                <td>$<input type="number" id="medio-valor4" value="0" min="0" step="0.01"></td>
+                <td class="resultado" id="medio-total">R$ 0,00</td>
+                <td><input type="number" id="medio-desc-perc" value="15" min="0" max="100" step="5">%</td>
+                <td class="resultado" id="medio-desc">R$ 0,00</td>
+            </tr>
+            <tr>
+                <td>Master</td>
+                <td><input type="number" id="master-qtd1" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor1" value="100" min="0" step="0.01"></td>
+                <td><input type="number" id="master-qtd2" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor2" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="master-qtd3" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor3" value="0" min="0" step="0.01"></td>
+                <td><input type="number" id="master-qtd4" value="1" min="0">x</td>
+                <td>$<input type="number" id="master-valor4" value="0" min="0" step="0.01"></td>
+                <td class="resultado" id="master-total">R$ 0,00</td>
+                <td><input type="number" id="master-desc-perc" value="15" min="0" max="100" step="5">%</td>
+                <td class="resultado" id="master-desc">R$ 0,00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="resultado-final"></div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+    <button onclick="copiarTexto('resultado-final')">Copiar resultado</button>
+    <span id="alerta-copiar" style="display: none; background-color: #4caf50; color: white; padding: 5px 10px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); font-size: 14px;">
+        Texto copiado!
+    </span>
+</div>
+<div id="alerta-calculo" style="display: none; position: fixed; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 10px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
+    <!-- Calculado! -->
+</div>
+
+    <script>
+        /*++++++++++++++++++zoom na imagem de todos os quartos+++++++++++++++++++++++++++++*/
+        function toggleZoom(element) {
+            element.classList.toggle('zoomed'); // Adiciona ou remove a classe 'zoomed' para ampliar/reduzir
+        }
+        /*++++++++++++++++++opçoes do adicional+++++++++++++++++++++++++++++*/
+        const input = document.getElementById('adicional-info');
+        const opcoes = ["casal", "camas separadas", "+ criança free", "+ bebê free"];
+
+        input.addEventListener('focus', () => {
+            let lista = document.createElement('ul');
+            lista.id = "sugestoes";
+            lista.style.position = "absolute";
+            lista.style.zIndex = "1000";
+            lista.style.border = "1px solid #ccc";
+            lista.style.width = input.offsetWidth + "px";
+
+            opcoes.forEach(opcao => {
+                let item = document.createElement('li');
+                item.textContent = opcao;
+                item.style.padding = "5px";
+                item.style.cursor = "pointer";
+
+                item.addEventListener('click', () => {
+                    input.value = opcao;
+                    lista.remove();
+                });
+
+                lista.appendChild(item);
+            });
+
+            document.body.appendChild(lista);
+
+            let rect = input.getBoundingClientRect();
+            lista.style.top = rect.bottom + "px";
+            lista.style.left = rect.left + "px";
+
+            input.addEventListener('blur', () => {
+                setTimeout(() => lista.remove(), 100);
+            });
+        });
+        /*++++++++++++++++++campos do podo de dias mudaremde acordo com entrada e saida+++++++++++++++++++++++++++++*/
+        document.getElementById('data-entrada').addEventListener('change', atualizarDataSaida);
+        document.getElementById('data-saida').addEventListener('change', calcularDiass);
+
+        function atualizarDataSaida() {
+            const entrada = document.getElementById('data-entrada').value;
+            const saida = document.getElementById('data-saida');
+            
+            if (entrada) {
+                const dataEntrada = new Date(entrada);
+                const dataSaida = new Date(dataEntrada);
+                dataSaida.setDate(dataEntrada.getDate() + 1);  // Saída sempre 1 dia após entrada
+
+                // Formatar a data para YYYY-MM-DD (formato aceito pelo input date)
+                const dataFormatada = dataSaida.toISOString().split('T')[0];
+                saida.value = dataFormatada;
+            }
+            calcularDiass();
+        }
+
+        function calcularDiass() {
+            const entrada = document.getElementById('data-entrada').value;
+            const saida = document.getElementById('data-saida').value;
+            const resultado = document.getElementById('resultado-dias');
+
+            if (entrada && saida) {
+                const dataEntrada = new Date(entrada);
+                const dataSaida = new Date(saida);
+
+                const diferencaMs = dataSaida - dataEntrada;
+                let dias = diferencaMs / (1000 * 60 * 60 * 24);
+
+                // Garante que pelo menos 1 dia será exibido
+                dias = dias >= 1 ? dias : 1;
+
+                resultado.innerHTML = `Total dias: ${dias}`;
+            } else {
+                resultado.innerHTML = `Total dias: 1`;
+            }
+        }
+
+        /*++++++++++++++++++campos mudarem os dias de acordo com entrade e saida+++++++++++++++++++++++++++++*/
+        const dataEntrada = document.getElementById('data-entrada');
+        const dataSaida = document.getElementById('data-saida');
+
+        const simplesQtd = document.getElementById('simples-qtd1');
+        const medioQtd = document.getElementById('medio-qtd1');
+        const masterQtd = document.getElementById('master-qtd1');
+
+        function calcularDias() {
+            const entrada = new Date(dataEntrada.value);
+            const saida = new Date(dataSaida.value);
+
+            if (!isNaN(entrada) && !isNaN(saida) && entrada < saida) {
+                // Calcula o número de dias entre as datas
+                const diffTime = Math.abs(saida - entrada);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const diasContados = diffDays > 0 ? diffDays : 0;
+
+                // Preenche automaticamente os campos de quantidade
+                simplesQtd.value = diasContados;
+                medioQtd.value = diasContados;
+                masterQtd.value = diasContados;
+            } else {
+                simplesQtd.value = 1;
+                medioQtd.value = 1;
+                masterQtd.value = 1;
+            }
+        }
+
+        // Adiciona eventos para recalcular ao mudar a data
+        dataEntrada.addEventListener('change', calcularDias);
+        dataSaida.addEventListener('change', calcularDias);
+
+        const valorInput = document.getElementById('valorInput');
+                const simplesDesc = document.getElementById('simples-desc-perc');
+                const medioDesc = document.getElementById('medio-desc-perc');
+                const masterDesc = document.getElementById('master-desc-perc');
+
+                // Inicializa os valores com 15
+        simplesDesc.value = 15;
+        medioDesc.value = 15;
+        masterDesc.value = 15;
+
+                // Atualiza os campos ao digitar no input
+                valorInput.addEventListener('input', () => {
+                    const valor = parseFloat(valorInput.value) || 0;
+                    
+                    simplesDesc.value = (valor).toFixed(0);
+                    medioDesc.value = (valor).toFixed(0);
+                    masterDesc.value = (valor).toFixed(0);
+                });
+
+        document.getElementById('data-entrada').addEventListener('change', function() {
+            const dataEntrada = new Date(this.value);
+            if (!isNaN(dataEntrada)) {
+                // Adiciona um dia à data de entrada
+                dataEntrada.setDate(dataEntrada.getDate() + 1);
+                
+                // Formata para YYYY-MM-DD
+                const proximaData = dataEntrada.toISOString().split('T')[0];
+                
+                // Define a data de saída automaticamente
+                document.getElementById('data-saida').value = proximaData;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+        atualizarCoresDosValores();
+        atualizarCorDescontoPercentual();
+        atualizarCorContadorTaxas();
+
+        // Eventos para atualizar as cores dinamicamente
+        const inputsDeValores = document.querySelectorAll('input[type="number"]');
+        inputsDeValores.forEach(input => {
+            input.addEventListener('input', () => {
+                atualizarCoresDosValores();
+                atualizarCorDescontoPercentual();
+            });
+        });
+
+        const inputTaxa = document.getElementById("taxa");
+        inputTaxa.addEventListener("input", atualizarCorContadorTaxas);
+    });
+
+    // Atualiza as cores dos valores (verde e vermelho)
+    function atualizarCoresDosValores() {
+        const categorias = ["simples", "medio", "master"];
+
+        categorias.forEach(categoria => {
+            for (let i = 1; i <= 4; i++) {
+                const valorInput = document.getElementById(`${categoria}-valor${i}`);
+                const valorAtual = parseFloat(valorInput.value) || 0;
+
+                if (valorAtual > 0) {
+                    valorInput.style.color = 'green'; // Verde para valores acima de 0
+                } else {
+                    valorInput.style.color = 'red'; // Vermelho para valores iguais a 0
+                }
+            }
+        });
+    }
+
+    // Atualiza as cores dos descontos percentuais (10%)
+    function atualizarCorDescontoPercentual() {
+        const categorias = ["simples", "medio", "master"];
+
+        categorias.forEach(categoria => {
+            const descontoPercentualElem = document.getElementById(`${categoria}-desc-perc`);
+            if (descontoPercentualElem) {
+                descontoPercentualElem.style.color = 'purple'; // Define a cor roxa para o percentual de desconto
+            }
+        });
+    }
+
+    // Atualiza a cor do contador de taxas (vermelho para 0, verde para 1 ou mais)
+    function atualizarCorContadorTaxas() {
+        const contadorElem = document.getElementById("contador-taxas");
+        const taxaAplicada = parseInt(contadorTaxas) || 0;
+
+        if (taxaAplicada === 0) {
+            contadorElem.style.color = 'red'; // Vermelho quando 0
+        } else {
+            contadorElem.style.color = 'green'; // Verde quando 1 ou mais
+        }
+    }
+
+     // campos de quantidade e valor pulando em sequencia campo em campo
+     document.addEventListener('DOMContentLoaded', () => {
+            // Define a sequência personalizada de campos
+            const sequence = [
+                "simples-qtd1",
+                "medio-qtd1",
+                "master-qtd1",
+                "simples-qtd2",
+                "medio-qtd2",
+                "master-qtd2",
+                "simples-qtd3",
+                "medio-qtd3",
+                "master-qtd3",
+                "simples-qtd4",
+                "medio-qtd4",
+                "master-qtd4",
+                "simples-valor1",
+                "medio-valor1",
+                "master-valor1",
+                "simples-valor2",
+                "medio-valor2",
+                "master-valor2",
+                "simples-valor3",
+                "medio-valor3",
+                "master-valor3",
+                "simples-valor4",
+                "medio-valor4",
+                "master-valor4",
+                "simples-desc-perc",
+                "medio-desc-perc",
+                "master-desc-perc",
+            ];
+
+            // Adiciona o evento keydown a cada campo da sequência
+            sequence.forEach((id, index) => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault(); // Previne o comportamento padrão do Enter
+                            const nextIndex = (index + 1) % sequence.length; // Move para o próximo campo, ciclando
+                            const nextInput = document.getElementById(sequence[nextIndex]);
+                            if (nextInput) {
+                                nextInput.focus(); // Foca no próximo campo
+                                nextInput.select(); // Seleciona o conteúdo do próximo campo
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+let contadorTaxas = 0; // Contador para controlar as taxas aplicadas
+
+function calcular() {
+    const categorias = ["simples", "medio", "master"];
+    const dataEntrada = document.getElementById("data-entrada").value;
+    const dataSaida = document.getElementById("data-saida").value;
+    const numeroPessoas = parseInt(document.getElementById("numero-pessoas").value) || 1;
+    const descontoPercentualsimples = parseInt(document.getElementById("simples-desc-perc").value);
+    const adicional = document.getElementById("adicional-info").value.trim() || " ";
+    const datapagar = document.getElementById("data-pagar").value;
+    const datapagarDate = new Date(datapagar + 'T12:00:00'); // Força o meio-dia para evitar ajuste // Força a hora para meia-noite
+    const dia = String(datapagarDate.getDate()).padStart(2, '0');
+    const mes = String(datapagarDate.getMonth() + 1).padStart(2, '0');
+    const dataFormatada = `${dia}/${mes}`;
+    const temTaxa = contadorTaxas > 0; // Verifica se as taxas foram aplicadas
+    // Captura a opção selecionada
+    const opcao = document.getElementById("opcoes").value;
+    // Textos pré-definidos para cada opção
+    const textos = {
+            hoje: `O restante no check-in em dinheiro ou pix ganha ${descontoPercentualsimples}% de desconto.
+        Com o desconto para pagamento em dinheiro fica:`,
+            umaDiaria: `Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pagamento em dinheiro ou pix fica:`,
+            cinquenta: `Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
+        No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
+        Com desconto fica:`,
+            cinquentaPromocao: `Estamos com promoção para o verão! Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
+        No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
+        Com desconto fica:`,
+            duasDiarias: `Solicitamos o pagamento de *duas diárias* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pagamento em dinheiro ou pix fica:`,
+            tresDiarias: `Solicitamos o pagamento de *tres diárias* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pagamento em dinheiro ou pix fica:`,
+        hojesem: `Possivel pagar em dinheiro, pix, cartão debito ou crédito.`,
+        cinquentasem: `Solicitamos o pagamento de *50%* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie, pix, cartão debito ou crédito.*`,
+        umaDiariasem: `Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie, pix, cartão debito ou crédito.*`,
+        duasDiariassem: `Solicitamos o pagamento de *duas diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie, pix, cartão debito ou crédito.*`,
+        tresDiariassem: `Solicitamos o pagamento de *tres diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie, pix, cartão debito ou crédito.*`
+    };
+
+    if (!dataEntrada || !dataSaida) {
+        alert("Por favor, preencha as datas de entrada e saída.");
+        return;
+    }
+        // Lógica de cálculo (pode ser implementada aqui)
+        const alerta = document.getElementById('alerta-calculo');
+
+        // Exibe o alerta com a porcentagem de desconto
+        alerta.innerHTML = `Calculado! ${descontoPercentualsimples}%`;
+
+        // Mostrar alerta
+        alerta.style.display = 'block';
+
+        // Ocultar alerta após 1 segundo
+        setTimeout(() => {
+            alerta.style.display = 'none';
+        }, 1000);
+
+    // Cabeçalho do orçamento
+    let periodo = `Orçamento de período ${dataEntrada.split("-").reverse().join("/")} a ${dataSaida.split("-").reverse().join("/")}, para ${numeroPessoas.toString().padStart(2, '0')} pessoa(s) ${adicional}`;
+    periodo += temTaxa ? ", já com taxas inclusas:\n" : ":\n";
+
+    let resultadoFinal = "Categoria \t      Total\n";
+    let resultadoDescontos = ""; //let resultadoDescontos = "Total \t      Total c/ desc.\n";
+    let temDesconto = false; // Variável para verificar se há desconto acima de 0%
+
+     // Função para formatar em reais
+     const formatarReal = (valor) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+    };
+
+    categorias.forEach(categoria => {
+        let total = 0;
+        let totalComDesconto = 0;
+        let descontoPercentual = parseFloat(document.getElementById(`${categoria}-desc-perc`).value) || 0;
+        let detalhes = ""; // Detalhes para a linha
+        let esgotado = true;
+
+        for (let i = 1; i <= 4; i++) {
+            const qtd = parseFloat(document.getElementById(`${categoria}-qtd${i}`).value) || 0;
+            const valor = parseFloat(document.getElementById(`${categoria}-valor${i}`).value) || 0;
+
+            if (qtd > 0 && valor > 0) {
+                esgotado = false;
+                detalhes += `${qtd}x${formatarReal(valor)} + `;
+                total += qtd * valor;
+            }
+        }
+
+        if (!esgotado) {
+            detalhes = detalhes.slice(0, -3); // Remove o último "+"
+            totalComDesconto = total - (total * (descontoPercentual / 100));
+
+            // Formatação de valores
+            const formatarValor = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = ${formatarValor(total)}\n`;
+
+            // Só adiciona desconto se o percentual for maior que 0
+            if (descontoPercentual > 0) {
+                temDesconto = true; // Marca que há pelo menos um desconto
+                resultadoDescontos += `${formatarValor(total)} *-${descontoPercentual}%* = ${formatarValor(totalComDesconto)}\n`;
+                document.getElementById(`${categoria}-desc`).innerText = formatarValor(totalComDesconto);
+            } else {
+                document.getElementById(`${categoria}-desc`).innerText = "-"; // Ou pode ocultar essa linha se preferir
+            }
+
+            // Atualiza a tabela com o total original
+            document.getElementById(`${categoria}-total`).innerText = formatarValor(total);
+        } else {
+            resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
+            document.getElementById(`${categoria}-total`).innerText = "Esgotado";
+            document.getElementById(`${categoria}-desc`).innerText = "-";
+        }
+
+        //versão anterior
+        // if (!esgotado) {
+        //     detalhes = detalhes.slice(0, -3); // Remove o último "+"
+        //     totalComDesconto = total - (total * (descontoPercentual / 100));
+
+        //     // Formatação de valores
+        //     const formatarValor = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        //     resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: ${detalhes} = ${formatarValor(total)}\n`;
+        //     resultadoDescontos += `${formatarValor(total)} *-${descontoPercentual}%* = ${formatarValor(totalComDesconto)}\n`;
+
+        //     // Atualiza a tabela
+        //     document.getElementById(`${categoria}-total`).innerText = formatarValor(total);
+        //     document.getElementById(`${categoria}-desc`).innerText = formatarValor(totalComDesconto);
+        // } else {
+        //     resultadoFinal += `${categoria.charAt(0).toUpperCase() + categoria.slice(1)}: Esgotado\n`;
+        //     document.getElementById(`${categoria}-total`).innerText = "Esgotado";
+        //     document.getElementById(`${categoria}-desc`).innerText = "-";
+        // }
+    });
+
+    // Se houver descontos, adiciona cabeçalho
+    if (temDesconto) {
+        resultadoDescontos = "Total \t      Total c/ desc.\n" + resultadoDescontos;
+    }
+
+    // Insere o texto explicativo da opção selecionada
+    const textoExplicativo = textos[opcao] || "";
+
+    let taxaServico = temTaxa ? "" : "\*É cobrado mais 10% Taxa Serviço*";
+    let check = `\n Os valores sem desconto poderá ser pago também no cartão de débito e crédito (Parcelamos em até 12x sem juros com parcela mínima de R$100,00)
+    \🛎️O nosso Check-in é a partir das 15:45h e o Check-out até as 12:00h.
+    \*Orçamento válido até prazo prescrito ou por dez dias.*`;
+
+    const resultadoCompleto = periodo + resultadoFinal + "\n" + textoExplicativo + "\n" + resultadoDescontos + taxaServico + check;
+
+    document.getElementById("resultado-final").innerText = resultadoCompleto || "Nenhuma categoria válida.";
+}
+
+function aplicarTaxas() {
+    const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+    const categorias = ["simples", "medio", "master"];
+
+    categorias.forEach(categoria => {
+        for (let i = 1; i <= 4; i++) {
+            const valorInput = document.getElementById(`${categoria}-valor${i}`);
+            const valorAtual = parseFloat(valorInput.value) || 0;
+            const valorComTaxa = valorAtual + (valorAtual * (taxaPercentual / 100));
+            valorInput.value = valorComTaxa.toFixed(2);
+        }
+    });
+
+    contadorTaxas++;
+    document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+    atualizarCorContadorTaxas();
+}
+
+function inverterTaxas() {
+    const taxaPercentual = parseFloat(document.getElementById("taxa").value) || 0;
+    const divisor = 1 + (taxaPercentual / 100);
+
+    ["simples", "medio", "master"].forEach(categoria => {
+        for (let i = 1; i <= 4; i++) {
+            const valorInput = document.getElementById(`${categoria}-valor${i}`);
+            const valorAtual = parseFloat(valorInput.value) || 0;
+            const valorOriginal = valorAtual / divisor;
+            valorInput.value = valorOriginal.toFixed(2);
+        }
+    });
+
+    contadorTaxas--;
+    document.getElementById("contador-taxas").innerText = `Taxas aplicadas ${contadorTaxas} vezes`;
+    atualizarCorContadorTaxas();
+}
+
+function atualizarCorContadorTaxas() {
+    const contadorElem = document.getElementById("contador-taxas");
+    contadorElem.style.color = contadorTaxas > 0 ? 'green' : 'red';
+}
+
+        function copiarTexto(elementoId) {
+            const elemento = document.getElementById(elementoId);
+            const texto = elemento.innerText;
+
+            if (texto.trim() !== "") {
+                navigator.clipboard.writeText(texto)
+                    .then(() => {
+                        exibirAlerta("Texto copiado!");
+                    })
+                    .catch(err => {
+                        console.error("Erro ao copiar texto: ", err);
+                    });
+            } else {
+                exibirAlerta("Nada para copiar!");
+            }
+        }
+
+        function exibirAlerta(mensagem) {
+            const alerta = document.getElementById("alerta-copiar");
+            alerta.innerText = mensagem;
+            alerta.style.display = "block";
+
+            // Oculta o alerta após 1 segundo
+            setTimeout(() => {
+                alerta.style.display = "none";
+            }, 1000);
+        }
+
+        // Pega a data atual no formato YYYY-MM-DD
+        const hoje = new Date().toISOString().split('T')[0];
+        // Define a data atual no campo
+        document.getElementById('data-pagar').value = hoje;
+
+        function abrirModal() {
+        document.getElementById("modalInfo").style.display = "block";
+        }
+
+        function fecharModal() {
+            document.getElementById("modalInfo").style.display = "none";
+        }
+
+        // Fechar o modal se clicar fora dele
+        window.onclick = function(event) {
+            const modal = document.getElementById("modalInfo");
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function atualizarPagina() {
+            location.reload(); // Atualiza a página
+        }
+
+        function abrirModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        // Fecha o modal ao clicar fora dele
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+
+
+    </script>
+</body>
+</html>
