@@ -153,6 +153,11 @@
             background-color: #f0f0f0;
         }
 
+        option[value="hojeDinheiro"] { background-color: lightgreen; }
+        option[value="umaDiariaDinheiro"] { background-color: lightgreen; }
+        option[value="hojePix"] { background-color: lightblue; }
+        option[value="hoje"] { background-color: #71dad1; }
+        option[value="hojesem"] { background-color: lightgray; }
     </style>
 </head>
 <body>
@@ -212,19 +217,23 @@
     <button id="meuBotao" type="button" onclick="calcular()">Calcular Totais</button>
     <!-- Campo de Seleção -->
     <label for="opcoes">Tipo orçamento:</label>
-    <select id="opcoes">
+    <select id="opcoes" onchange="mudarCor()">
         <option value="hojeDinheiro">Hoje grana</option>
         <option value="umaDiariaDinheiro">*uma diária* grana</option>
-        <option value="cinquentaDinheiro">50% total grana até</option>
-        <option value="cinquentaPromocaoDinheiro">Promo verão 50% grana até</option>
+        <option value="cinquentaDinheiro">50% total grana</option>
         <option value="duasDiariasDinheiro">*duas diárias* grana</option>
         <option value="tresDiariasDinheiro">*três diárias* grana</option>
-        <option value="hoje">Hoje pix</option>
-        <option value="umaDiaria">*uma diária* pix</option>
-        <option value="cinquenta">50% total pix até</option>
-        <option value="cinquentaPromocao">Promo verão 50% pix até</option>
-        <option value="duasDiarias">*duas diárias* pix</option>
-        <option value="tresDiarias">*três diárias* pix</option>
+        <option value="hojePix">Hoje Pix</option>
+        <option value="umaDiariaPix">*uma diária* Pix</option>
+        <option value="cinquentaPix">50% total Pix</option>
+        <option value="duasDiariasPix">*duas diárias* Pix</option>
+        <option value="tresDiariasPix">*três diárias* Pix</option>
+        <option value="hoje">Hoje pixGrana</option>
+        <option value="umaDiaria">*uma diária* pixGrana</option>
+        <option value="cinquenta">50% total pixGrana até</option>
+        <option value="cinquentaPromocao">Promo verão 50% pixGrana até</option>
+        <option value="duasDiarias">*duas diárias* pixGrana</option>
+        <option value="tresDiarias">*três diárias* pixGrana</option>
         <option value="hojesem">Hoje sem desc.</option>
         <option value="cinquentasem">50% total sem desc. até</option>
         <option value="umaDiariasem">*uma diária* sem desc.</option>
@@ -595,10 +604,43 @@ function calcular() {
     const opcao = document.getElementById("opcoes").value;
     // Textos pré-definidos para cada opção
     const textos = {
+        hojeDinheiro: `O restante no check-in em dinheiro ganha ${descontoPercentualsimples}% de desconto.
+        OBS:se for pagamento em pix ganhará apenas 5% de desconto.
+        Com o desconto para pagamento em dinheiro de ${descontoPercentualsimples}% fica:`,
+        umaDiariaDinheiro: `Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        OBS:se for pagamento em pix ganhará apenas 5% de desconto.
+        Com o desconto para pagamento em dinheiro de ${descontoPercentualsimples}% fica:`,
+        cinquentaDinheiro: `Solicitamos o pagamento de *50% do valor total* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        OBS:se for pagamento em pix ganhará apenas 5% de desconto.
+        Com o desconto para pagamento em dinheiro de ${descontoPercentualsimples}% fica:`,
+            duasDiariasDinheiro: `Solicitamos o pagamento de *duas diárias* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        OBS:se for pagamento em pix ganhará apenas 5% de desconto.
+        Com o desconto para pagamento em dinheiro de ${descontoPercentualsimples}% fica:`,
+            tresDiariasDinheiro: `Solicitamos o pagamento de *tres diárias* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        OBS:se for pagamento em pix ganhará apenas 5% de desconto.
+        Com o desconto para pagamento em dinheiro de ${descontoPercentualsimples}% fica:`,
+        hojePix: `O restante no check-in no pix ganha ${descontoPercentualsimples}% de desconto.
+        Com o desconto para pagamento no pix fica:`,
+            umaDiariaPix: `Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in no pix ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pix fica:`,
+            cinquentaPix: `Solicitamos o pagamento de *50% do valor total* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in no pix ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pagamento no pix fica:`,
+            duasDiariasPix: `Solicitamos o pagamento de *duas diárias* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in no pix ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pagamento no pix fica:`,
+            tresDiariasPix: `Solicitamos o pagamento de *tres diárias* antecipada por PIX/TED ou DOC para confirmar a reserva.
+        *O restante no check-in no pix ganha ${descontoPercentualsimples}% de desconto*.
+        Com o desconto para pagamento no pix fica:`,
             hoje: `O restante no check-in em dinheiro ou pix ganha ${descontoPercentualsimples}% de desconto.
         Com o desconto para pagamento em dinheiro fica:`,
             umaDiaria: `Solicitamos o pagamento de *uma diária* antecipada por PIX/TED ou DOC para confirmar a reserva.
-        *O restante no check-in em dinheiro espécie ganha ${descontoPercentualsimples}% de desconto*.
+        *O restante no check-in em dinheiro espécie ou pix ganha ${descontoPercentualsimples}% de desconto*.
         Com o desconto para pagamento em dinheiro ou pix fica:`,
             cinquenta: `Ofertamos ${descontoPercentualsimples}% de desconto mediante ao pagamento de 50% do valor total da diária, até o dia ${dataFormatada}.
         No dia do check-in, o desconto é aplicado para pagamento via pix ou dinheiro.
