@@ -155,6 +155,12 @@
             background-color: #f0f0f0;
         }
 
+        option[value="hojeDinheiro"] { background-color: lightgreen; }
+        option[value="umaDiariaDinheiro"] { background-color: lightgreen; }
+        option[value="hojePix"] { background-color: lightblue; }
+        option[value="hoje"] { background-color: #71dad1; }
+        option[value="hojesem"] { background-color: lightgray; }
+
     </style>
 </head>
 <body>
@@ -221,6 +227,16 @@
     <!-- Campo de Seleção -->
     <label for="opcoes">Tipo orçamento:</label>
     <select id="opcoes">
+        <option value="hojeDinheiro">Hoje grana</option>
+        <option value="umaDiariaDinheiro">*uma diária* grana</option>
+        <option value="cinquentaDinheiro">50% total grana</option>
+        <option value="duasDiariasDinheiro">*duas diárias* grana</option>
+        <option value="tresDiariasDinheiro">*três diárias* grana</option>
+        <option value="hojePix">Hoje Pix</option>
+        <option value="umaDiariaPix">*uma diária* Pix</option>
+        <option value="cinquentaPix">50% total Pix</option>
+        <option value="duasDiariasPix">*duas diárias* Pix</option>
+        <option value="tresDiariasPix">*três diárias* Pix</option>
         <option value="hoje">Hoje</option>
         <option value="umaDiaria">*uma diária* antecipada</option>
         <option value="cinquenta">50% total antecipada até</option>
@@ -606,6 +622,39 @@ function calcular() {
     const opcao = document.getElementById("opcoes").value;
     // Textos pré-definidos para cada opção
     const textos = {
+        hojeDinheiro: `El resto en efectivo al momento del check-in obtiene un descuento del ${descontoPercentualsimples}% de desconto.
+        NOTA: si pagas en pix solo recibirás un 5% de descuento.
+        Con el descuento ${descontoPercentualsimples}% por pago en efectivo queda:`,
+        umaDiariaDinheiro: `Solicitamos el pago de *una noche* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
+        *El resto al momento del check-in en efectivo recibe un ${descontoPercentualsimples}% de descuento*.
+        NOTA: si pagas en pix solo recibirás un 5% de descuento.
+        Con el descuento ${descontoPercentualsimples}% por pago en efectivo queda:`,
+        cinquentaDinheiro: `Solicitamos el pago de *50% del valor total* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
+        *El resto al momento del check-in en efectivo recibe un ${descontoPercentualsimples}% de descuento*.
+        NOTA: si pagas en pix solo recibirás un 5% de descuento.
+        Con el descuento ${descontoPercentualsimples}% por pago en efectivo queda:`,
+            duasDiariasDinheiro: `Solicitamos el pago de *dos noche* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
+        *El resto al momento del check-in en efectivo recibe un ${descontoPercentualsimples}% de descuento*.
+        NOTA: si pagas en pix solo recibirás un 5% de descuento.
+        Con el descuento ${descontoPercentualsimples}% por pago en efectivo queda:`,
+            tresDiariasDinheiro: `Solicitamos el pago de *tres noche* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
+        *El resto al momento del check-in en efectivo recibe un ${descontoPercentualsimples}% de descuento*.
+        NOTA: si pagas en pix solo recibirás un 5% de descuento.
+        Con el descuento ${descontoPercentualsimples}% por pago en efectivo queda:`,
+        hojePix: `El resto en el check-in mediante PIX tiene un descuento del ${descontoPercentualsimples}%.
+        Con el descuento por pago en PIX queda:`,
+            umaDiariaPix: `Solicitamos el pago de *una noche* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
+        *El resto, si se paga en PIX durante el check-in, tiene un descuento del ${descontoPercentualsimples}%*.
+        Con el descuento por pago vía PIX queda:`,
+            cinquentaPix: `Solicitamos el pago de *50% del valor total* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
+        *El resto, si se paga en PIX durante el check-in, tiene un descuento del ${descontoPercentualsimples}%*.
+        Con el descuento por pago vía PIX queda:`,
+            duasDiariasPix: `Solicitamos el pago de *dos noches* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
+        *El resto, si se paga en PIX durante el check-in, tiene un descuento del ${descontoPercentualsimples}%*.
+        Con el descuento por pago vía PIX queda:`,
+            tresDiariasPix: `Solicitamos el pago de *tres noches* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
+        *El resto, si se paga en PIX durante el check-in, tiene un descuento del ${descontoPercentualsimples}%*.
+        Con el descuento por pago vía PIX queda:`,
             hoje: `El resto en el check-in en efectivo o mediante PIX tiene un descuento del ${descontoPercentualsimples}% 
             Con el descuento por pago en efectivo queda:`,
             umaDiaria: `Solicitamos el pago de *una noche* por adelantado mediante PIX/TED o DOC para confirmar la reserva.
